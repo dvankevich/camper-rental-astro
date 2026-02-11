@@ -1,0 +1,164 @@
+@import "modern-normalize/modern-normalize.css";
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-VariableFont_opsz_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* light theme */
+:root {
+  --font-family: "Inter", sans-serif;
+  --main: #101828;
+  --text: #475467;
+  --white: #fff;
+  --inputs: #f7f7f7;
+  --badges: #f2f4f7;
+  --gray: #6c717b;
+  --gray-light: #dadde1;
+  --button: #e44848;
+  --button-hover: #d84343;
+  --rating: #ffc531;
+
+  color-scheme: light;
+}
+
+/* reassign colors for dark theme */
+[data-theme="dark"] {
+  --white: #101828;
+  --main: #f9fafb;
+  --text: #98a2b3;
+  --inputs: #1d2939;
+  --badges: #344054;
+  --gray-light: #475467;
+  color-scheme: dark;
+}
+
+/* Automatically enabled IF the user has not selected a theme manually */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --white: #101828;
+    --main: #f9fafb;
+    --text: #98a2b3;
+    --inputs: #1d2939;
+    --badges: #344054;
+    --gray-light: #475467;
+    color-scheme: dark;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html,
+body {
+  background-color: var(--white);
+  color: var(--main);
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Додано з #root */
+
+  /* Стилі з вашого #root для центрування */
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  /* Центрування сторінки */
+
+  /* Базові стилі */
+  background-color: var(--white);
+  color: var(--main);
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input,
+textarea,
+select {
+  background-color: var(--inputs);
+  color: var(--main);
+  border: 1px solid var(--gray-light);
+  font-family: inherit;
+  padding: 8px;
+  border-radius: 4px;
+  outline: none;
+}
+
+button {
+  background-color: var(--button);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+@media (hover: hover) {
+  button:hover {
+    background-color: var(--button-hover);
+  }
+}
+
+
+main {
+  flex-grow: 1;
+  width: 100%;
+}
