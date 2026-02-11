@@ -1,0 +1,9 @@
+# Дозволити всім роботам індексувати весь сайт
+User-agent: *
+Allow: /
+
+
+Disallow: /favorites
+# Disallow: /private
+
+Sitemap: https://react-test-task-01.vercel.app/sitemap.xml
