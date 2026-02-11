@@ -1,31 +1,28 @@
 ---
 // src/layouts/Layout.astro
-import "../styles/global.css"; // Тут будуть ваші змінні та скидання стилів
+import "../styles/global.css";
+import Header from "../components/Header.astro"; // Імпортуємо Header
 
-const { title } = Astro.props;
+const { title = "TravelTrucks" } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="description" content="Camper Rental App" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <title>{title}</title>
-        <script src="htmx.org"></script>
-    </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Rent your dream camper" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>{title}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  </head>
+  <body>
+    <Header />
 
-    <body>
-        <header>
-            <nav>
-                <a href="/">Home</a>
-                <a href="/catalog">Catalog</a>
-            </nav>
-        </header>
-
-        <main>
-            <slot />
-        </main>
-    </body>
+    <main>
+      <slot />
+    </main>
+  </body>
 </html>

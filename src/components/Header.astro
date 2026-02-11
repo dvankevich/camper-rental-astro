@@ -1,0 +1,91 @@
+---
+// src/components/Header.astro
+const pathname = Astro.url.pathname;
+
+// Функція для перевірки активного класу
+// @ts-expect-error it`s a javascript project
+const isActive = (path) => {
+  // Якщо це головна '/'
+  if (path === "/" && pathname === "/") return "active";
+  // Якщо це інші сторінки, наприклад '/catalog'
+  if (path !== "/" && pathname.startsWith(path)) return "active";
+  return "";
+};
+---
+
+<header class="header">
+  <div class="container">
+    <a href="/" class="logo" aria-label="Go to homepage">
+      Travel<span>Trucks</span>
+    </a>
+
+    <nav class="nav">
+      <ul class="nav-list">
+        <li>
+          <a href="/" class={`nav-link ${isActive("/")}`}>Home</a>
+        </li>
+        <li>
+          <a href="/catalog" class={`nav-link ${isActive("/catalog")}`}
+            >Catalog</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    background-color: var(--inputs); /* Світло-сірий фон з вашої теми */
+    padding: 24px 0;
+    border-bottom: 1px solid var(--gray-light);
+  }
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Використовуємо обмеження ширини як у вашому body */
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 64px; /* Відступи як в оригіналі */
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--main);
+  }
+
+  .logo span {
+    color: var(--text);
+  }
+
+  .nav-list {
+    display: flex;
+    gap: 32px;
+  }
+
+  .nav-link {
+    font-weight: 500;
+    color: var(--main);
+    transition: color 0.3s;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: var(--button);
+  }
+
+  /* Активний стан - червона крапка або колір */
+  .nav-link.active {
+    color: var(--button);
+  }
+
+  /* Мобільна адаптація (базова) */
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 20px;
+    }
+  }
+</style>
