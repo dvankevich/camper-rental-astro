@@ -1,0 +1,104 @@
+---
+// src/pages/catalog.astro
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Catalog - TravelTrucks">
+  <section class="catalog-placeholder">
+    <div class="container">
+      <h1>Our Campers</h1>
+      <p>
+        The catalog is under construction. Soon you will see our amazing campers
+        here!
+      </p>
+
+      <div class="mock-grid">
+        {
+          [1, 2, 3, 4].map((i) => (
+            <div class="mock-card">
+              <div class="mock-image" />
+              <div class="mock-content">
+                <div class="mock-title" />
+                <div class="mock-text" />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <a href="/" class="back-link">← Back to Home</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .catalog-placeholder {
+    padding: 64px 0;
+  }
+
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 64px;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: var(--text);
+    margin-bottom: 48px;
+  }
+
+  /* Проста сітка-заглушка */
+  .mock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .mock-card {
+    border: 1px solid var(--gray-light);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .mock-image {
+    height: 200px;
+    background-color: var(--badges);
+  }
+
+  .mock-content {
+    padding: 24px;
+  }
+
+  .mock-title {
+    height: 24px;
+    width: 70%;
+    background-color: var(--gray-light);
+    margin-bottom: 12px;
+    border-radius: 4px;
+  }
+
+  .mock-text {
+    height: 16px;
+    width: 100%;
+    background-color: var(--badges);
+    border-radius: 4px;
+  }
+
+  .back-link {
+    color: var(--button);
+    text-decoration: underline;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 20px;
+    }
+  }
+</style>
