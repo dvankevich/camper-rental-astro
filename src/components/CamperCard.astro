@@ -1,7 +1,9 @@
 ---
+// src/components/CamperCard.astro
 import Icon from "./Icon.astro";
 import FavoriteButton from "./FavoriteButton.jsx";
 import type { Camper } from "../types/camper";
+import { EQUIPMENT_OPTIONS } from "../constants/equipment";
 
 interface Props {
   camper: Camper;
@@ -11,20 +13,33 @@ const { camper } = Astro.props;
 
 const formattedPrice = `€${camper.price.toFixed(2)}`;
 
-// Маппінг характеристик для бейджів
-const features = [
-  { label: `${camper.adults} adults`, icon: "Users" },
-  { label: camper.transmission, icon: "Transmission", capitalize: true },
+/**
+ * 1. Характеристики, які ми беремо з текстових полів API
+ * (Трансмісія та Двигун є завжди)
+ */
+const technicalFeatures = [
+  { label: camper.transmission, icon: "transmission", capitalize: true },
   { label: camper.engine, icon: "Engine", capitalize: true },
-  { label: "Kitchen", icon: "Kitchen", show: camper.kitchen },
-  { label: `${camper.beds} beds`, icon: "Bed" },
-  { label: "AC", icon: "AC", show: camper.AC },
-].filter((f) => f.show !== false);
+];
+
+/**
+ * 2. Динамічне обладнання (булеві поля)
+ * Ми проходимо по EQUIPMENT_OPTIONS і перевіряємо, чи є таке поле в camper і чи воно true.
+ */
+const equipmentFeatures = EQUIPMENT_OPTIONS.map((opt) => ({
+  label: opt.label,
+  icon: opt.icon,
+  // Важливо: перевіряємо чи значення в camper саме true
+  show: camper[opt.name as keyof typeof camper] === true,
+})).filter((f) => f.show);
+
+// 3. Об'єднуємо все в один список
+const allFeatures = [...technicalFeatures, ...equipmentFeatures];
 ---
 
 <div class="card">
   <div class="image-wrapper">
-    <img src={camper.gallery[0].thumb} alt={camper.name} />
+    <img src={camper.gallery[0].thumb} alt={camper.name} loading="lazy" />
   </div>
 
   <div class="content">
@@ -37,34 +52,36 @@ const features = [
     </div>
 
     <div class="info-row">
-      <span class="rating">
+      <div class="rating">
         <Icon name="StarFull" size={16} class="star-icon" />
-        <span class="underline"
-          >{camper.rating} ({camper.reviews.length} Reviews)</span
-        >
-      </span>
-      <span class="location">
+        <span class="underline">
+          {camper.rating} ({camper.reviews.length} Reviews)
+        </span>
+      </div>
+      <div class="location">
         <Icon name="Map" size={16} />
-        {camper.location}
-      </span>
+        <span>{camper.location}</span>
+      </div>
     </div>
 
-    <p class="description">{camper.description}</p>
+    <p class="description" title={camper.description}>
+      {camper.description}
+    </p>
 
     <ul class="features-list">
       {
-        features.map((feat) => (
+        allFeatures.map((feat) => (
           <li class="feature-badge">
             <Icon name={feat.icon} size={20} />
-            <span class={feat.capitalize ? "capitalize" : ""}>
-              {feat.label}
-            </span>
+            <span class="capitalize">{feat.label}</span>
           </li>
         ))
       }
     </ul>
 
-    <a href={`/catalog/${camper.id}`} class="btn-primary">Show more</a>
+    <div class="actions">
+      <a href={`/catalog/${camper.id}`} class="btn-primary"> Show more </a>
+    </div>
   </div>
 </div>
 
@@ -76,6 +93,11 @@ const features = [
     border: 1px solid var(--gray-light);
     border-radius: 20px;
     background: var(--white);
+    transition: border-color 0.3s ease;
+  }
+
+  .card:hover {
+    border-color: var(--main);
   }
 
   .image-wrapper {
@@ -84,6 +106,7 @@ const features = [
     flex-shrink: 0;
     border-radius: 10px;
     overflow: hidden;
+    background-color: var(--badges); /* Плейсхолдер поки вантажиться фото */
   }
 
   .image-wrapper img {
@@ -94,32 +117,46 @@ const features = [
 
   .content {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .header-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 8px;
   }
 
   .title {
     font-size: 24px;
     font-weight: 600;
+    line-height: 1.2;
+    color: var(--main);
+    margin: 0;
+    max-width: 340px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .price-container {
     display: flex;
     align-items: center;
     gap: 12px;
+  }
+
+  .price {
     font-size: 24px;
     font-weight: 600;
+    color: var(--main);
   }
 
   .info-row {
     display: flex;
     gap: 16px;
     margin-bottom: 24px;
+    font-size: 16px;
   }
 
   .rating,
@@ -132,13 +169,16 @@ const features = [
   .star-icon {
     color: var(--rating);
   }
+
   .underline {
     text-decoration: underline;
   }
 
   .description {
     color: var(--text);
+    line-height: 1.5;
     margin-bottom: 24px;
+    /* Обрізаємо текст до одного рядка */
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
@@ -150,6 +190,8 @@ const features = [
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 24px;
+    padding: 0;
+    list-style: none;
   }
 
   .feature-badge {
@@ -159,11 +201,17 @@ const features = [
     padding: 12px 18px;
     background: var(--badges);
     border-radius: 100px;
+    font-size: 16px;
     font-weight: 500;
+    color: var(--main);
   }
 
   .capitalize {
     text-transform: capitalize;
+  }
+
+  .actions {
+    margin-top: auto;
   }
 
   .btn-primary {
@@ -172,11 +220,24 @@ const features = [
     color: white;
     padding: 16px 40px;
     border-radius: 200px;
+    font-size: 16px;
     font-weight: 500;
-    transition: background 0.3s;
+    text-decoration: none;
+    transition: background 0.3s ease;
   }
 
   .btn-primary:hover {
     background: var(--button-hover);
+  }
+
+  /* Адаптивність для мобілок */
+  @media (max-width: 768px) {
+    .card {
+      flex-direction: column;
+    }
+    .image-wrapper {
+      width: 100%;
+      height: 200px;
+    }
   }
 </style>

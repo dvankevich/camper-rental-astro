@@ -1,41 +1,71 @@
 ---
+// src/components/Icon.astro
 import { Icon as AstroIcon } from "astro-icon/components";
+
+// 1. Імпортуємо тип для HTML/SVG атрибутів
+import type { HTMLAttributes } from "astro/types";
+
+// 2. Розширюємо стандартні атрибути SVG
+// Це автоматично додасть підтримку class, style, id, aria-*, onClick тощо.
+interface Props extends HTMLAttributes<"svg"> {
+  name: string;
+  size?: number;
+  // class вже є всередині HTMLAttributes<'svg'>, тому його не треба писати вручну
+}
 
 const { name, size = 20, class: className, ...props } = Astro.props;
 
-const iconMap = {
-  // Навігація та UI
-  Map: "bi:map",
-  Heart: "bi:heart",
-  HeartFill: "bi:heart-fill",
-  StarFull: "bi:star-fill",
-  StarHalf: "bi:star-half",
+// Всі ключі ТІЛЬКИ в нижньому регістрі (lowercase)
+const iconMap: Record<string, string> = {
+  // --- UI та Навігація ---
+  map: "bi:map",
+  heart: "bi:heart",
+  heartfill: "bi:heart-fill",
+  starfull: "bi:star-fill",
+  starhalf: "bi:star-half",
+  display: "bi:display",
+  moon: "bi:moon-fill",
+  sun: "bi:sun-fill",
 
-  // Типи кемперів (Vehicle Type)
-  Van: "bi:grid-1x2",
-  FullyIntegrated: "bi:grid",
-  Alcove: "bi:grid-3x3-gap",
+  // --- Типи кемперів (Vehicle Type) ---
+  van: "bi:grid-1x2",
+  fullyintegrated: "bi:grid",
+  alcove: "bi:grid-3x3-gap",
 
-  // Характеристики (Features)
-  Users: "bi:people",
-  Transmission: "bi:diagram-3",
-  Engine: "bi:fuel-pump",
-  AC: "bi:wind",
-  Kitchen: "bi:cup-hot",
-  Bed: "bi:door-closed",
-  TV: "bi:tv",
-  Radio: "bi:ui-radios",
-  Fridge: "lucide:refrigerator",
-  Microwave: "lucide:microwave",
-  Stove: "hugeicons:gas-stove",
-  Water: "ion:water-outline",
-  Shower: "ph:shower",
+  // --- Обладнання (Features) ---
+  ac: "bi:wind",
+  transmission: "bi:diagram-3",
+  kitchen: "bi:cup-hot",
+  tv: "bi:display",
+  bathroom: "ph:shower",
+  shower: "ph:shower", // Аліас
+  refrigerator: "lucide:refrigerator",
+  fridge: "lucide:refrigerator", // Аліас
+  microwave: "lucide:microwave",
+  gas: "hugeicons:gas-stove",
+  water: "ion:water-outline",
+  engine: "bi:fuel-pump",
+  users: "bi:people",
+  radio: "bi:ui-radios",
+  bed: "bi:door-closed",
 
-  Default: "bi:question-circle",
+  default: "bi:question-circle",
 };
 
-// @ts-expect-error it`s a javascript project
-const iconName = iconMap[name] || iconMap.Default;
+// 1. Приводимо вхідне ім'я до нижнього регістру (напр. "Transmission" -> "transmission", "AC" -> "ac")
+const normalizedName = name.toLowerCase();
+
+// 2. Шукаємо в мапі або віддаємо дефолтну іконку
+// Якщо ви хочете дозволити передавати прямі назви іконок (наприклад "mdi:home"), додайте `|| name` перед дефолтом.
+const iconName = iconMap[normalizedName] || iconMap.default;
+// Приведення до Record<string, unknown> замість any
+const svgProps = props as Record<string, unknown>;
 ---
 
-<AstroIcon name={iconName} size={size} class={className} {...props} />
+{
+  /* Ми використовуємо {...props as any}, щоб уникнути конфлікту складних типів атрибутів Astro
+   з внутрішніми типами бібліотеки astro-icon.
+   Це безпечно, оскільки ми обмежили зовнішній інтерфейс Props типом HTMLAttributes<"svg">.
+*/
+}
+<AstroIcon name={iconName} size={size} class={className} {...svgProps} />
