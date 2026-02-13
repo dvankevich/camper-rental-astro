@@ -1,0 +1,41 @@
+---
+import { Icon as AstroIcon } from "astro-icon/components";
+
+const { name, size = 20, class: className, ...props } = Astro.props;
+
+const iconMap = {
+  // Навігація та UI
+  Map: "bi:map",
+  Heart: "bi:heart",
+  HeartFill: "bi:heart-fill",
+  StarFull: "bi:star-fill",
+  StarHalf: "bi:star-half",
+
+  // Типи кемперів (Vehicle Type)
+  Van: "bi:grid-1x2",
+  FullyIntegrated: "bi:grid",
+  Alcove: "bi:grid-3x3-gap",
+
+  // Характеристики (Features)
+  Users: "bi:people",
+  Transmission: "bi:diagram-3",
+  Engine: "bi:fuel-pump",
+  AC: "bi:wind",
+  Kitchen: "bi:cup-hot",
+  Bed: "bi:door-closed",
+  TV: "bi:tv",
+  Radio: "bi:ui-radios",
+  Fridge: "lucide:refrigerator",
+  Microwave: "lucide:microwave",
+  Stove: "hugeicons:gas-stove",
+  Water: "ion:water-outline",
+  Shower: "ph:shower",
+
+  Default: "bi:question-circle",
+};
+
+// @ts-expect-error it`s a javascript project
+const iconName = iconMap[name] || iconMap.Default;
+---
+
+<AstroIcon name={iconName} size={size} class={className} {...props} />
