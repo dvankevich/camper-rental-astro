@@ -1,7 +1,7 @@
 import { favorites, toggleFavorite } from "../lib/store";
 import "iconify-icon"; // Імпортуємо для реєстрації тегу <iconify-icon>
 
-export default function FavoriteButton({ camper, className }) {
+export default function FavoriteButton({ camper, className = "" }) {
   const isFavorite = favorites.value.some((fav) => fav.id === camper.id);
 
   const handleClick = (e) => {

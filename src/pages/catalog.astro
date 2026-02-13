@@ -21,7 +21,7 @@ console.log("Content:", JSON.stringify(campers).slice(0, 100)); // покаже 
           Array.isArray(campers) && campers.length > 0 ? (
             <ul class="campers-list">
               {campers.map((camper) => (
-                <li key={camper.id}>
+                <li>
                   <CamperCard camper={camper} />
                 </li>
               ))}

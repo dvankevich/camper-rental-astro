@@ -1,6 +1,11 @@
 ---
 import Icon from "./Icon.astro";
 import FavoriteButton from "./FavoriteButton.jsx";
+import type { Camper } from "../types/camper";
+
+interface Props {
+  camper: Camper;
+}
 
 const { camper } = Astro.props;
 
