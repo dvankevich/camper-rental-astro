@@ -30,40 +30,73 @@ npm install -D @iconify-json/bi @iconify-json/lucide @iconify-json/hugeicons @ic
 
 ```javascript
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import preact from '@astrojs/preact';
-import icon from 'astro-icon'; // <--- 1. Імпортуємо
+import { defineConfig } from "astro/config";
+import preact from "@astrojs/preact";
+import icon from "astro-icon"; // <--- 1. Імпортуємо
 
 export default defineConfig({
   integrations: [
     preact(),
-    icon() // <--- 2. Додаємо в масив
-  ]
+    icon(), // <--- 2. Додаємо в масив
+  ],
 });
-
 ```
 
-### Використання `iconify-icon` (Web Component)
+Все, що рендериться всередині `.astro` через `astro-icon`, під час білду стає статичним SVG і не робить запитів. А от клієнтські компоненти (наші "острівці" Preact) зазвичай тягнуть іконки з мережі, що створює затримку та зайвий трафік.
 
-Для Preact офіційно рекомендується використовувати універсальний пакет **`@iconify/react`**, оскільки Preact має повну сумісність із React-компонентами через `preact/compat`.
+Найкращий спосіб позбутися цього — створити маленькі **Preact-компоненти для цих іконок**. Оскільки це звичайний JSX, вони просто вшиються у ваш JavaScript-бандл.
 
-Цей метод найкращий, тому що він не залежить від фреймворку (Preact/React) і не потребує складних імпортів.
+### Крок 1: Створимо файл з SVG-компонентами
 
-**1. Встановіть пакет (він точно є, це загальний стандарт):**
-
-```bash
-npm install iconify-icon
-
-```
-
-**2. Оновіть `src/components/FavoriteButton.jsx`:**
-Замініть весь код на цей. Тут ми просто використовуємо веб-компонент, який реєструється при імпорті.
+Створіть файл `src/components/ui/LocalIcons.jsx` (або просто додайте це в початок файлу з кнопкою).
 
 ```jsx
-import { favorites, toggleFavorite } from '../lib/store';
-import 'iconify-icon'; // Імпортуємо для реєстрації тегу <iconify-icon>
+// src/components/ui/LocalIcons.jsx
 
-export default function FavoriteButton({ camper, className }) {
+export const HeartIcon = (props) => (
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 16 16"
+  >
+    <path
+      fill="currentColor"
+      d="m8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385c.92 1.815 2.834 3.989 6.286 6.357c3.452-2.368 5.365-4.542 6.286-6.357c.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"
+    />
+  </svg>
+);
+
+export const HeartFillIcon = (props) => (
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 16 16"
+  >
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M8 1.314C12.438-3.248 23.534 4.735 8 15C-7.534 4.736 3.562-3.248 8 1.314"
+    />
+  </svg>
+);
+```
+
+---
+
+### Крок 2: Оновимо `FavoriteButton.jsx`
+
+Тепер ми просто імпортуємо ці іконки. Жодних `iconify-icon`, жодних запитів до API.
+
+```jsx
+// src/components/FavoriteButton.jsx
+import { favorites, toggleFavorite } from "../lib/store";
+import { HeartIcon, HeartFillIcon } from "./ui/LocalIcons";
+
+export default function FavoriteButton({ camper, className = "" }) {
   const isFavorite = favorites.value.some((fav) => fav.id === camper.id);
 
   const handleClick = (e) => {
@@ -72,19 +105,33 @@ export default function FavoriteButton({ camper, className }) {
   };
 
   return (
-    <button 
-      onClick={handleClick} 
+    <button
+      onClick={handleClick}
       className={className}
-      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      style={{
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: 0,
+        display: "flex",
+        color: isFavorite ? "var(--button)" : "var(--main)",
+      }}
     >
-      <iconify-icon 
-        icon={isFavorite ? "bi:heart-fill" : "bi:heart"} 
-        width="24" 
-        height="24" 
-        style={{ color: isFavorite ? 'var(--button)' : 'var(--main)' }}
-      ></iconify-icon>
+      {isFavorite ? <HeartFillIcon /> : <HeartIcon />}
     </button>
   );
 }
-
 ```
+
+---
+
+### Чому це ідеальне рішення:
+
+1. **Миттєва реакція:** Іконка змінюється миттєво, бо код уже в пам'яті браузера.
+2. **Zero Network:** Жодного запиту до `api.iconify.design` у клієнта.
+3. **Повний контроль:** Ви можете легко міняти `fill`, `stroke` чи розміри через пропси або CSS змінні.
+
+### А що з іншими іконками в `Icon.astro`?
+
+Там **нічого міняти не треба**. Пакет `astro-icon` під час виконання команди `npm run build` витягує код іконок і вставляє його прямо в HTML (інлайнить). Тобто користувач отримає готовий SVG без жодних додаткових запитів.

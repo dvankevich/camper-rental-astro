@@ -1,5 +1,6 @@
+// src/components/FavoriteButton.jsx
 import { favorites, toggleFavorite } from "../lib/store";
-import "iconify-icon"; // Імпортуємо для реєстрації тегу <iconify-icon>
+import { HeartIcon, HeartFillIcon } from "./ui/LocalIcons";
 
 export default function FavoriteButton({ camper, className = "" }) {
   const isFavorite = favorites.value.some((fav) => fav.id === camper.id);
@@ -13,20 +14,17 @@ export default function FavoriteButton({ camper, className = "" }) {
     <button
       onClick={handleClick}
       className={className}
+      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
       style={{
         background: "none",
         border: "none",
         cursor: "pointer",
         padding: 0,
         display: "flex",
+        color: isFavorite ? "var(--button)" : "var(--main)",
       }}
     >
-      <iconify-icon
-        icon={isFavorite ? "bi:heart-fill" : "bi:heart"}
-        width="24"
-        height="24"
-        style={{ color: isFavorite ? "var(--button)" : "var(--main)" }}
-      ></iconify-icon>
+      {isFavorite ? <HeartFillIcon /> : <HeartIcon />}
     </button>
   );
 }
