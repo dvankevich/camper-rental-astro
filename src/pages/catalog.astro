@@ -5,15 +5,14 @@ import Layout from "../layouts/Layout.astro";
 import CamperCard from "../components/CamperCard.astro";
 import Pagination from "../components/Pagination.astro";
 import { fetchCampers } from "../lib/api";
+import type { Camper } from "../types/camper";
 
 const pageParam = Astro.url.searchParams.get("page");
 const currentPage = Math.max(1, Number(pageParam) || 1);
 const limit = 4;
 
-const { items: campers, total } = await fetchCampers({
-  page: currentPage,
-  limit,
-});
+const { items, total } = await fetchCampers({ page: currentPage, limit });
+const campers: Camper[] = items;
 const totalPages = Math.ceil(total / limit);
 
 // Перевіряємо, чи це запит від HTMX
@@ -38,7 +37,7 @@ const isHtmx = Astro.request.headers.get("hx-request") === "true";
       />
     </div>
   ) : (
-    /* 2. Якщо це звичайний заїзд на сторінку — віддаємо все разом з Layout */
+    /* 2. Якщо це звичайний захід на сторінку — віддаємо все разом з Layout */
     <Layout title="Catalog">
       <section class="catalog-section">
         <div class="container">
