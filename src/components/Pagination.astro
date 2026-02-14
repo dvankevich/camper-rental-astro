@@ -1,0 +1,109 @@
+---
+// src/components/Pagination.astro
+import Icon from "./Icon.astro";
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+const activePage = Number(currentPage);
+
+// Генеруємо масив номерів сторінок: [1, 2, 3, 4...]
+// Для великої кількості сторінок тут можна додати логіку з "..."
+const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+const hasPrev = currentPage > 1;
+const hasNext = currentPage < totalPages;
+---
+
+{
+  totalPages > 1 && (
+    <nav class="pagination" aria-label="Pagination">
+      {/* Кнопка "Назад" */}
+      <a
+        href={hasPrev ? `${baseUrl}?page=${currentPage - 1}` : undefined}
+        class={`page-btn prev ${!hasPrev ? "disabled" : ""}`}
+        aria-disabled={!hasPrev}
+      >
+        <Icon name="bi:chevron-left" size={20} /> {/* Або просто "<" */}
+      </a>
+
+      {/* Цифри */}
+      <div class="pages-list">
+        {pages.map((page) => (
+          <a
+            href={`${baseUrl}?page=${page}`}
+            class={`page-link ${Number(page) === activePage ? "active" : ""}`}
+          >
+            {page}
+          </a>
+        ))}
+      </div>
+
+      {/* Кнопка "Вперед" */}
+      <a
+        href={hasNext ? `${baseUrl}?page=${currentPage + 1}` : undefined}
+        class={`page-btn next ${!hasNext ? "disabled" : ""}`}
+        aria-disabled={!hasNext}
+      >
+        <Icon name="bi:chevron-right" size={20} /> {/* Або просто ">" */}
+      </a>
+    </nav>
+  )
+}
+
+<style>
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .pages-list {
+    display: flex;
+    gap: 12px;
+  }
+
+  .page-link {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--gray-light);
+    text-decoration: none;
+    color: var(--main);
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .page-link:hover {
+    border-color: var(--button);
+  }
+
+  .page-link.active {
+    background-color: var(--button);
+    border-color: var(--button);
+    color: #fff;
+  }
+
+  .page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--main);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .page-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+</style>
