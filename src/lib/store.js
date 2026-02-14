@@ -19,12 +19,13 @@ effect(() => {
   }
 });
 
-// Функція toggle (аналог вашого toggleFavorite з Redux)
 export const toggleFavorite = (camper) => {
-  const isExists = favorites.value.some((f) => f.id === camper.id);
+  const current = favorites.value;
+  const isExists = current.some((f) => f.id === camper.id);
+
   if (isExists) {
-    favorites.value = favorites.value.filter((f) => f.id !== camper.id);
+    favorites.value = current.filter((f) => f.id !== camper.id);
   } else {
-    favorites.value = [...favorites.value, camper];
+    favorites.value = [...current, camper];
   }
 };

@@ -47,7 +47,7 @@ const allFeatures = [...technicalFeatures, ...equipmentFeatures];
       <h2 class="title">{camper.name}</h2>
       <div class="price-container">
         <span class="price">{formattedPrice}</span>
-        <FavoriteButton camper={camper} client:load />
+        <FavoriteButton client:only="preact" camper={camper} />
       </div>
     </div>
 
