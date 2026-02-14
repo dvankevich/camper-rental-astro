@@ -9,34 +9,48 @@ interface Props {
 }
 
 const { currentPage, totalPages, baseUrl } = Astro.props;
-const activePage = Number(currentPage);
 
-// Генеруємо масив номерів сторінок: [1, 2, 3, 4...]
-// Для великої кількості сторінок тут можна додати логіку з "..."
+// Генеруємо масив сторінок
 const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
 const hasPrev = currentPage > 1;
 const hasNext = currentPage < totalPages;
+
+// Функція для створення URL
+const getUrl = (p: number) => `${baseUrl}?page=${p}`;
 ---
 
 {
   totalPages > 1 && (
-    <nav class="pagination" aria-label="Pagination">
+    <nav
+      class="pagination"
+      aria-label="Pagination"
+      hx-boost="true"
+      hx-target="#catalog-container"
+      hx-select="#catalog-container"
+      hx-swap="outerHTML"
+    >
+      {/* hx-boost: робить посилання всередині "швидкими" (AJAX)
+        hx-target: замінює контент у вказаному селекторі
+        hx-select: вибирає тільки потрібну частину з отриманої сторінки
+        hx-swap: замінює весь старий контейнер на новий
+    */}
+
       {/* Кнопка "Назад" */}
       <a
-        href={hasPrev ? `${baseUrl}?page=${currentPage - 1}` : undefined}
-        class={`page-btn prev ${!hasPrev ? "disabled" : ""}`}
+        href={hasPrev ? getUrl(currentPage - 1) : "#"}
+        class={`page-control ${!hasPrev ? "disabled" : ""}`}
         aria-disabled={!hasPrev}
       >
-        <Icon name="bi:chevron-left" size={20} /> {/* Або просто "<" */}
+        <Icon name="bi:chevron-left" size={24} />
       </a>
 
-      {/* Цифри */}
       <div class="pages-list">
         {pages.map((page) => (
           <a
-            href={`${baseUrl}?page=${page}`}
-            class={`page-link ${Number(page) === activePage ? "active" : ""}`}
+            href={getUrl(page)}
+            class={`page-link ${page === currentPage ? "active" : ""}`}
+            aria-current={page === currentPage ? "page" : undefined}
           >
             {page}
           </a>
@@ -45,11 +59,11 @@ const hasNext = currentPage < totalPages;
 
       {/* Кнопка "Вперед" */}
       <a
-        href={hasNext ? `${baseUrl}?page=${currentPage + 1}` : undefined}
-        class={`page-btn next ${!hasNext ? "disabled" : ""}`}
+        href={hasNext ? getUrl(currentPage + 1) : "#"}
+        class={`page-control ${!hasNext ? "disabled" : ""}`}
         aria-disabled={!hasNext}
       >
-        <Icon name="bi:chevron-right" size={20} /> {/* Або просто ">" */}
+        <Icon name="bi:chevron-right" size={24} />
       </a>
     </nav>
   )
@@ -61,49 +75,51 @@ const hasNext = currentPage < totalPages;
     justify-content: center;
     align-items: center;
     gap: 24px;
-    margin-top: 40px;
+    margin-top: 64px;
   }
 
   .pages-list {
     display: flex;
-    gap: 12px;
+    gap: 8px;
   }
 
   .page-link {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    border: 1px solid var(--gray-light);
     text-decoration: none;
     color: var(--main);
+    font-size: 16px;
     font-weight: 500;
-    transition: all 0.3s;
+    transition: all 0.2s ease-in-out;
   }
 
-  .page-link:hover {
-    border-color: var(--button);
+  .page-link:hover:not(.active) {
+    background-color: var(--inputs);
   }
 
   .page-link.active {
     background-color: var(--button);
-    border-color: var(--button);
-    color: #fff;
+    color: white;
   }
 
-  .page-btn {
+  .page-control {
     display: flex;
     align-items: center;
-    justify-content: center;
     color: var(--main);
-    text-decoration: none;
-    cursor: pointer;
+    transition: color 0.2s;
   }
 
-  .page-btn.disabled {
-    opacity: 0.3;
+  .page-control:hover:not(.disabled) {
+    color: var(--button);
+  }
+
+  .page-control.disabled {
+    color: var(--gray-light);
+    cursor: not-allowed;
     pointer-events: none;
   }
 </style>

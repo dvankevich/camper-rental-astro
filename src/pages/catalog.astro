@@ -1,64 +1,74 @@
 ---
 // src/pages/catalog.astro
-export const prerender = false; // Вимикаємо статичну генерацію для цієї сторінки
+export const prerender = false;
 import Layout from "../layouts/Layout.astro";
 import CamperCard from "../components/CamperCard.astro";
-import Pagination from "../components/Pagination.astro"; // Імпорт нового компонента
+import Pagination from "../components/Pagination.astro";
 import { fetchCampers } from "../lib/api";
 
-// 1. Визначаємо поточну сторінку з URL (за замовчуванням 1)
 const pageParam = Astro.url.searchParams.get("page");
-// Надійний спосіб конвертації:
-// Якщо не число або менше 1 -> завжди 1
 const currentPage = Math.max(1, Number(pageParam) || 1);
-// Для перевірки додайте лог:
-console.log("pageParam: ", pageParam);
-console.log(`Current page: ${currentPage}, Type: ${typeof currentPage}`);
 const limit = 4;
 
-// 2. Робимо запит
 const { items: campers, total } = await fetchCampers({
   page: currentPage,
   limit,
 });
-
-// 3. Рахуємо загальну кількість сторінок
 const totalPages = Math.ceil(total / limit);
-console.log("total from API: ", total);
-console.log("totalPages: ", totalPages);
+
+// Перевіряємо, чи це запит від HTMX
+const isHtmx = Astro.request.headers.get("hx-request") === "true";
 ---
 
-<Layout title="Catalog">
-  <section class="catalog-section">
-    <div class="container">
-      <div class="list-container">
-        {/* Список кемперів */}
-        {
-          campers.length > 0 ? (
-            <ul class="campers-list">
-              {campers.map((camper) => (
-                <li>
-                  <CamperCard camper={camper} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div class="empty-state">
-              <p>No campers found.</p>
-            </div>
-          )
-        }
-
-        {/* Пагінація */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          baseUrl="/catalog"
-        />
-      </div>
+{/* 1. Якщо це HTMX запит — віддаємо ТІЛЬКИ нутрощі */}
+{
+  isHtmx ? (
+    <div id="catalog-container">
+      <ul class="campers-list">
+        {campers.map((camper) => (
+          <li>
+            <CamperCard camper={camper} />
+          </li>
+        ))}
+      </ul>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl="/catalog"
+      />
     </div>
-  </section>
-</Layout>
+  ) : (
+    /* 2. Якщо це звичайний заїзд на сторінку — віддаємо все разом з Layout */
+    <Layout title="Catalog">
+      <section class="catalog-section">
+        <div class="container">
+          {/* Огортаємо в div з ID, який HTMX буде замінювати */}
+          <div id="catalog-container">
+            {campers.length > 0 ? (
+              <ul class="campers-list">
+                {campers.map((camper) => (
+                  <li>
+                    <CamperCard camper={camper} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div class="empty-state">
+                <p>No campers found.</p>
+              </div>
+            )}
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl="/catalog"
+            />
+          </div>
+        </div>
+      </section>
+    </Layout>
+  )
+}
 
 <style>
   .catalog-section {
