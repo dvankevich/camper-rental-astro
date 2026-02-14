@@ -1,6 +1,6 @@
 // src/components/ui/LocalIcons.jsx
 
-export const HeartIcon = ({ size = 24, color, ...props }) => (
+export const HeartIcon = ({ size = 24, color = "currentColor", ...props }) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"

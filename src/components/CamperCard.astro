@@ -4,6 +4,7 @@ import Icon from "./Icon.astro";
 import FavoriteButton from "./FavoriteButton.jsx";
 import type { Camper } from "../types/camper";
 import { EQUIPMENT_OPTIONS } from "../constants/equipment";
+import { HeartIcon } from "./ui/LocalIcons";
 
 interface Props {
   camper: Camper;
@@ -47,7 +48,12 @@ const allFeatures = [...technicalFeatures, ...equipmentFeatures];
       <h2 class="title">{camper.name}</h2>
       <div class="price-container">
         <span class="price">{formattedPrice}</span>
-        <FavoriteButton client:only="preact" camper={camper} />
+        <FavoriteButton client:only="preact" camper={camper}>
+          <div slot="fallback" class="favorite-btn-placeholder">
+            {/* Використовуємо іконку як статичну заглушку */}
+            <HeartIcon size={24} />
+          </div>
+        </FavoriteButton>
       </div>
     </div>
 
@@ -86,6 +92,18 @@ const allFeatures = [...technicalFeatures, ...equipmentFeatures];
 </div>
 
 <style>
+  .favorite-btn-placeholder {
+    /* Додаємо ті ж самі розміри та відступи, що й у кнопки,
+       щоб при завантаженні JS нічого не "стрибало" */
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--main); /* Колір за замовчуванням (неактивний) */
+    cursor: pointer;
+  }
+
   .card {
     display: flex;
     gap: 24px;

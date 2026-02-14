@@ -34,7 +34,7 @@ export default function FavoriteButton({ camper, className = "" }) {
       {isFavorite ? <HeartFillIcon size={24} /> : <HeartIcon size={24} />}
 
       {/* Ваш дебаг-текст теж буде оновлюватись */}
-      <span style={{ marginLeft: "8px" }}>{isFavorite ? "Fav" : "..."}</span>
+      {/* <span style={{ marginLeft: "8px" }}>{isFavorite ? "Fav" : "..."}</span> */}
     </button>
   );
 }
