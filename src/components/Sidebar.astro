@@ -1,114 +1,297 @@
 ---
-// src/components/Sidebar.astro
+import Icon from "./Icon.astro";
+
+const { searchParams } = Astro.url;
+
+// Поточні значення для ініціалізації активних станів
+const currentForm = searchParams.get("form") || "";
+
+const equipmentOptions = [
+  { name: "AC", icon: "AC", label: "AC" },
+  { name: "transmission", icon: "Transmission", label: "Automatic" },
+  { name: "kitchen", icon: "Kitchen", label: "Kitchen" },
+  { name: "TV", icon: "TV", label: "TV" },
+  { name: "bathroom", icon: "Bathroom", label: "Bathroom" },
+];
+
+const typeOptions = [
+  { value: "panelTruck", icon: "Van", label: "Van" },
+  {
+    value: "fullyIntegrated",
+    icon: "FullyIntegrated",
+    label: "Fully Integrated",
+  },
+  { value: "alcove", icon: "Alcove", label: "Alcove" },
+];
 ---
 
 <aside class="sidebar">
   <form
+    id="filter-form"
     hx-get="/catalog"
     hx-target="#catalog-container"
-    hx-select="#catalog-container"
     hx-swap="innerHTML"
     hx-push-url="true"
-    hx-trigger="change delay:200ms, submit"
     class="filter-form"
   >
-    {/* 1. Location Filter */}
+    <input type="hidden" name="form" id="input-form" value={currentForm} />
+    {
+      equipmentOptions.map((opt) => (
+        <input
+          type="hidden"
+          name={opt.name}
+          id={`input-${opt.name}`}
+          value={searchParams.get(opt.name) || ""}
+        />
+      ))
+    }
+
     <div class="filter-group">
-      <label class="label-title" for="location">Location</label>
-      <div class="input-wrapper">
+      <label class="label-title">Location</label>
+      <div class="location-wrapper">
+        <Icon name="Map" size={18} class="map-icon" />
         <input
           type="text"
           name="location"
-          id="location"
-          placeholder="City, Country"
+          placeholder="City"
+          value={searchParams.get("location") || ""}
           class="location-input"
         />
       </div>
     </div>
 
-    {/* 2. Filters (Vehicle Equipment) */}
-    <div class="filter-group">
-      <p class="filter-subtitle">Filters</p>
-      <h3 class="filter-main-title">Vehicle equipment</h3>
-      <div class="divider"></div>
+    <div class="filters-container">
+      <p class="filters-hint">Filters</p>
 
-      <div class="equipment-grid">
-        <label class="equipment-card">
-          <input type="checkbox" name="AC" />
-          <div class="card-content">
-            {/* Тут можна вставити іконку AC */}
-            <span>AC</span>
-          </div>
-        </label>
+      <section class="section">
+        <h3 class="section-title">Vehicle equipment</h3>
+        <div class="filter-grid">
+          {
+            equipmentOptions.map((opt) => {
+              // Визначаємо активність кнопки при завантаженні сторінки
+              const isActive =
+                opt.name === "transmission"
+                  ? searchParams.get("transmission") === "automatic"
+                  : searchParams.get(opt.name) === "true";
 
-        <label class="equipment-card">
-          <input type="checkbox" name="kitchen" />
-          <div class="card-content">
-            <span>Kitchen</span>
-          </div>
-        </label>
+              return (
+                <button
+                  type="button"
+                  class={`filter-item ${isActive ? "active" : ""}`}
+                  data-filter-type="equipment"
+                  data-name={opt.name}
+                >
+                  <Icon name={opt.icon} size={32} />
+                  <span class="filter-label">{opt.label}</span>
+                </button>
+              );
+            })
+          }
+        </div>
+      </section>
 
-        <label class="equipment-card">
-          <input type="checkbox" name="TV" />
-          <div class="card-content">
-            <span>TV</span>
-          </div>
-        </label>
-      </div>
+      <section class="section">
+        <h3 class="section-title">Vehicle type</h3>
+        <div class="filter-grid">
+          {
+            typeOptions.map((opt) => (
+              <button
+                type="button"
+                class={`filter-item ${currentForm === opt.value ? "active" : ""}`}
+                data-filter-type="form"
+                data-value={opt.value}
+              >
+                <Icon name={opt.icon} size={32} />
+                <span class="filter-label">{opt.label}</span>
+              </button>
+            ))
+          }
+        </div>
+      </section>
     </div>
 
-    {/* 3. Vehicle Type */}
-    <div class="filter-group">
-      <h3 class="filter-main-title">Vehicle type</h3>
-      <div class="divider"></div>
-      <div class="equipment-grid">
-        <label class="equipment-card">
-          <input type="radio" name="form" value="panelTruck" />
-          <div class="card-content">Van</div>
-        </label>
-        <label class="equipment-card">
-          <input type="radio" name="form" value="fullyIntegrated" />
-          <div class="card-content">Integrated</div>
-        </label>
-      </div>
-    </div>
-
-    <button type="submit" class="button primary-btn">Search</button>
+    <button type="submit" class="search-btn">Search</button>
   </form>
 </aside>
 
+<script>
+  // 1. Очищення порожніх параметрів перед відправкою (щоб URL був чистим)
+  interface HtmxConfigRequestEvent extends CustomEvent {
+    detail: {
+      parameters: Record<string, unknown>;
+      unfilteredParameters: Record<string, unknown>;
+      headers: Record<string, unknown>;
+      target: HTMLElement;
+      verb: string;
+    };
+  }
+
+  // Обробник
+  document.body.addEventListener("htmx:configRequest", ((
+    event: HtmxConfigRequestEvent,
+  ) => {
+    const params = event.detail.parameters;
+
+    Object.keys(params).forEach((key) => {
+      const value = params[key];
+
+      // Перевірка на пусті значення
+      // unknown дозволяє суворе порівняння (===), тому це валідно
+      if (value === "" || value === null || value === undefined) {
+        delete params[key];
+      }
+    });
+  }) as EventListener);
+
+  // 2. Функція для ініціалізації обробників кнопок-фільтрів
+  function setupFilters() {
+    const buttons = document.querySelectorAll(".filter-item");
+
+    buttons.forEach((btn) => {
+      // Видаляємо старі обробники, щоб не було дублювання
+      btn.replaceWith(btn.cloneNode(true));
+    });
+
+    document.querySelectorAll(".filter-item").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const b = e.currentTarget as HTMLButtonElement;
+        const type = b.dataset.filterType;
+
+        if (type === "equipment") {
+          const name = b.dataset.name;
+          const input = document.getElementById(
+            `input-${name}`,
+          ) as HTMLInputElement;
+
+          if (name === "transmission") {
+            const isAuto = input.value === "automatic";
+            input.value = isAuto ? "" : "automatic";
+          } else {
+            const isTrue = input.value === "true";
+            input.value = isTrue ? "" : "true";
+          }
+          b.classList.toggle("active");
+        } else if (type === "form") {
+          const val = b.dataset.value;
+          const input = document.getElementById(
+            "input-form",
+          ) as HTMLInputElement;
+
+          if (input.value === val) {
+            input.value = "";
+            b.classList.remove("active");
+          } else {
+            document
+              .querySelectorAll('[data-filter-type="form"]')
+              .forEach((el) => el.classList.remove("active"));
+            input.value = val || "";
+            b.classList.add("active");
+          }
+        }
+      });
+    });
+  }
+
+  // Запуск при першому завантаженні
+  setupFilters();
+
+  // Запуск після кожного оновлення через HTMX
+  document.body.addEventListener("htmx:afterSwap", setupFilters);
+</script>
+
 <style>
-  /* Короткий приклад стилів для "плиток" */
-  .equipment-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 112px);
-    gap: 8px;
-    margin-top: 24px;
+  .sidebar {
+    width: 360px;
+  }
+  .filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .label-title {
+    color: rgba(17, 24, 39, 0.6);
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
   }
 
-  .equipment-card input {
-    display: none; /* Ховаємо стандартний чекбокс */
-  }
-
-  .card-content {
-    border: 1px solid var(--inputs);
+  .location-input {
+    width: 100%;
+    padding: 18px 18px 18px 44px;
+    background: #f7f7f7;
+    border: none;
     border-radius: 12px;
+    font-size: 16px;
+  }
+  .location-wrapper {
+    position: relative;
+  }
+  .map-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .filters-hint {
+    color: #475467;
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(16, 24, 40, 0.1);
+    margin-bottom: 24px;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 8px;
+    margin-bottom: 32px;
+  }
+
+  .filter-item {
     height: 95px;
+    border: 1px solid rgba(16, 24, 40, 0.1);
+    border-radius: 12px;
+    background: white;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
     cursor: pointer;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
+    color: #101828 !important;
   }
 
-  .equipment-card input:checked + .card-content {
-    border-color: var(--button);
+  .filter-item:hover {
+    border-color: #e44848;
+  }
+  .filter-item.active {
+    border-color: #e44848;
+    border-width: 1px;
+  }
+  .filter-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #101828;
   }
 
-  .sidebar {
-    position: sticky;
-    top: 20px; /* Відступ від верху екрана */
-    align-self: flex-start; /* Важливо для flex-контейнерів */
+  .search-btn {
+    background: #e44848;
+    color: white;
+    padding: 16px 60px;
+    border-radius: 200px;
+    font-size: 16px;
+    font-weight: 500;
+    width: 173px;
+    transition: background 0.3s;
+  }
+  .search-btn:hover {
+    background: #d84343;
   }
 </style>

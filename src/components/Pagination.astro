@@ -16,8 +16,8 @@ const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 const hasPrev = currentPage > 1;
 const hasNext = currentPage < totalPages;
 
-// Функція для створення URL
-const getUrl = (p: number) => `${baseUrl}?page=${p}`;
+// Створюємо базовий URL без параметрів, бо HTMX додасть їх сам через include
+const pureBaseUrl = baseUrl.split("?")[0];
 ---
 
 {
@@ -25,12 +25,12 @@ const getUrl = (p: number) => `${baseUrl}?page=${p}`;
     <nav
       class="pagination"
       aria-label="Pagination"
-      hx-boost="true"
+      hx-include="#filter-form"
       hx-target="#catalog-container"
-      hx-select="#catalog-container"
-      hx-swap="outerHTML"
+      hx-swap="innerHTML"
+      hx-push-url="true"
     >
-      {/* hx-boost: робить посилання всередині "швидкими" (AJAX)
+      {/*
         hx-target: замінює контент у вказаному селекторі
         hx-select: вибирає тільки потрібну частину з отриманої сторінки
         hx-swap: замінює весь старий контейнер на новий
@@ -38,7 +38,8 @@ const getUrl = (p: number) => `${baseUrl}?page=${p}`;
 
       {/* Кнопка "Назад" */}
       <a
-        href={hasPrev ? getUrl(currentPage - 1) : "#"}
+        href={hasPrev ? `${pureBaseUrl}?page=${currentPage - 1}` : "#"}
+        hx-get={`${pureBaseUrl}?page=${currentPage - 1}`}
         class={`page-control ${!hasPrev ? "disabled" : ""}`}
         aria-disabled={!hasPrev}
       >
@@ -48,7 +49,8 @@ const getUrl = (p: number) => `${baseUrl}?page=${p}`;
       <div class="pages-list">
         {pages.map((page) => (
           <a
-            href={getUrl(page)}
+            href={`${pureBaseUrl}?page=${page}`}
+            hx-get={`${pureBaseUrl}?page=${page}`}
             class={`page-link ${page === currentPage ? "active" : ""}`}
             aria-current={page === currentPage ? "page" : undefined}
           >
@@ -59,7 +61,8 @@ const getUrl = (p: number) => `${baseUrl}?page=${p}`;
 
       {/* Кнопка "Вперед" */}
       <a
-        href={hasNext ? getUrl(currentPage + 1) : "#"}
+        href={hasNext ? `${pureBaseUrl}?page=${currentPage + 1}` : "#"}
+        hx-get={`${pureBaseUrl}?page=${currentPage + 1}`}
         class={`page-control ${!hasNext ? "disabled" : ""}`}
         aria-disabled={!hasNext}
       >
