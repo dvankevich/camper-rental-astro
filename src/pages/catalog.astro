@@ -4,64 +4,84 @@ export const prerender = false;
 import Layout from "../layouts/Layout.astro";
 import CamperCard from "../components/CamperCard.astro";
 import Pagination from "../components/Pagination.astro";
+import Sidebar from "../components/Sidebar.astro";
 import { fetchCampers } from "../lib/api";
 import type { Camper } from "../types/camper";
 
-const pageParam = Astro.url.searchParams.get("page");
+const searchParams = Astro.url.searchParams;
+const pageParam = searchParams.get("page");
 const currentPage = Math.max(1, Number(pageParam) || 1);
 const limit = 4;
+const queryParams = Object.fromEntries(searchParams.entries());
 
-const { items, total } = await fetchCampers({ page: currentPage, limit });
+const { items, total } = await fetchCampers({
+  ...queryParams,
+  page: currentPage,
+  limit,
+});
+
 const campers: Camper[] = items;
 const totalPages = Math.ceil(total / limit);
-
-// Перевіряємо, чи це запит від HTMX
 const isHtmx = Astro.request.headers.get("hx-request") === "true";
 ---
 
-{/* 1. Якщо це HTMX запит — віддаємо ТІЛЬКИ нутрощі */}
 {
   isHtmx ? (
-    <div id="catalog-container">
-      <ul class="campers-list">
-        {campers.map((camper) => (
-          <li>
-            <CamperCard camper={camper} />
-          </li>
-        ))}
-      </ul>
+    /* 1. HTMX ВІДПОВІДЬ: Тільки те, що всередині #catalog-container */
+    /* Важливо: не додаємо сюди ніяких layout-сіток, тільки список і пагінацію */
+    <>
+      {campers.length > 0 ? (
+        <ul class="campers-list">
+          {campers.map((camper) => (
+            <li>
+              <CamperCard camper={camper} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-state">
+          <p>No campers found.</p>
+        </div>
+      )}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         baseUrl="/catalog"
       />
-    </div>
+    </>
   ) : (
-    /* 2. Якщо це звичайний захід на сторінку — віддаємо все разом з Layout */
+    /* 2. ПОВНЕ ЗАВАНТАЖЕННЯ: Весь макет зі стилями */
     <Layout title="Catalog">
       <section class="catalog-section">
         <div class="container">
-          {/* Огортаємо в div з ID, який HTMX буде замінювати */}
-          <div id="catalog-container">
-            {campers.length > 0 ? (
-              <ul class="campers-list">
-                {campers.map((camper) => (
-                  <li>
-                    <CamperCard camper={camper} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div class="empty-state">
-                <p>No campers found.</p>
-              </div>
-            )}
+          <div class="catalog-grid">
+            {/* Сайдбар завжди зліва */}
+            <aside class="sidebar-wrapper">
+              <Sidebar />
+            </aside>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              baseUrl="/catalog"
-            />
+            {/* Контейнер, який HTMX буде перемальовувати */}
+            <main id="catalog-container" class="content-wrapper">
+              {campers.length > 0 ? (
+                <ul class="campers-list">
+                  {campers.map((camper) => (
+                    <li>
+                      <CamperCard camper={camper} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div class="empty-state">
+                  <p>No campers found.</p>
+                </div>
+              )}
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                baseUrl="/catalog"
+              />
+            </main>
           </div>
         </div>
       </section>
@@ -69,19 +89,53 @@ const isHtmx = Astro.request.headers.get("hx-request") === "true";
   )
 }
 
-<style>
-  .catalog-section {
-    padding: 64px 0;
+<style is:global>
+  /* is:global потрібен, щоб стилі застосовувалися до HTMX-контенту,
+     який приходить пізніше
+  */
+  .catalog-grid {
+    display: grid !important;
+    grid-template-columns: 360px 1fr !important;
+    gap: 64px !important;
+    align-items: start;
+    width: 100%;
   }
-  .container {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0 64px;
+
+  .sidebar-wrapper {
+    width: 360px;
   }
+
+  .content-wrapper {
+    min-width: 0; /* Запобігає розтягуванню гріда довгими словами */
+  }
+
   .campers-list {
     display: flex;
     flex-direction: column;
     gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     margin-bottom: 40px;
+  }
+
+  /* Додаткова перевірка: якщо контент все одно падає вниз,
+     можливо, container замалий */
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 64px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 1100px) {
+    .catalog-grid {
+      grid-template-columns: 1fr !important;
+      gap: 32px !important;
+    }
+    .sidebar-wrapper {
+      width: 100%;
+    }
   }
 </style>

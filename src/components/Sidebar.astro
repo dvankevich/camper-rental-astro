@@ -1,0 +1,114 @@
+---
+// src/components/Sidebar.astro
+---
+
+<aside class="sidebar">
+  <form
+    hx-get="/catalog"
+    hx-target="#catalog-container"
+    hx-select="#catalog-container"
+    hx-swap="innerHTML"
+    hx-push-url="true"
+    hx-trigger="change delay:200ms, submit"
+    class="filter-form"
+  >
+    {/* 1. Location Filter */}
+    <div class="filter-group">
+      <label class="label-title" for="location">Location</label>
+      <div class="input-wrapper">
+        <input
+          type="text"
+          name="location"
+          id="location"
+          placeholder="City, Country"
+          class="location-input"
+        />
+      </div>
+    </div>
+
+    {/* 2. Filters (Vehicle Equipment) */}
+    <div class="filter-group">
+      <p class="filter-subtitle">Filters</p>
+      <h3 class="filter-main-title">Vehicle equipment</h3>
+      <div class="divider"></div>
+
+      <div class="equipment-grid">
+        <label class="equipment-card">
+          <input type="checkbox" name="AC" />
+          <div class="card-content">
+            {/* Тут можна вставити іконку AC */}
+            <span>AC</span>
+          </div>
+        </label>
+
+        <label class="equipment-card">
+          <input type="checkbox" name="kitchen" />
+          <div class="card-content">
+            <span>Kitchen</span>
+          </div>
+        </label>
+
+        <label class="equipment-card">
+          <input type="checkbox" name="TV" />
+          <div class="card-content">
+            <span>TV</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    {/* 3. Vehicle Type */}
+    <div class="filter-group">
+      <h3 class="filter-main-title">Vehicle type</h3>
+      <div class="divider"></div>
+      <div class="equipment-grid">
+        <label class="equipment-card">
+          <input type="radio" name="form" value="panelTruck" />
+          <div class="card-content">Van</div>
+        </label>
+        <label class="equipment-card">
+          <input type="radio" name="form" value="fullyIntegrated" />
+          <div class="card-content">Integrated</div>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="button primary-btn">Search</button>
+  </form>
+</aside>
+
+<style>
+  /* Короткий приклад стилів для "плиток" */
+  .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 112px);
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .equipment-card input {
+    display: none; /* Ховаємо стандартний чекбокс */
+  }
+
+  .card-content {
+    border: 1px solid var(--inputs);
+    border-radius: 12px;
+    height: 95px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.3s;
+  }
+
+  .equipment-card input:checked + .card-content {
+    border-color: var(--button);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 20px; /* Відступ від верху екрана */
+    align-self: flex-start; /* Важливо для flex-контейнерів */
+  }
+</style>
