@@ -1,0 +1,164 @@
+---
+// src/components/BookingForm.astro
+---
+
+<form class="booking-form" id="booking-form">
+  <div class="input-group">
+    <input type="text" name="name" placeholder="Name" required />
+  </div>
+
+  <div class="input-group">
+    <input type="email" name="email" placeholder="Email" required />
+  </div>
+
+  <div class="input-group date-input-wrapper">
+    <input
+      type="text"
+      id="booking-date"
+      name="date"
+      placeholder="Booking date"
+      readonly
+      required
+    />
+  </div>
+
+  <div class="input-group">
+    <textarea name="comment" placeholder="Comment" rows="4"></textarea>
+  </div>
+
+  <button type="submit" class="send-btn">Send</button>
+</form>
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
+
+<script>
+  import flatpickr from "flatpickr";
+
+  const initCalendar = () => {
+    flatpickr("#booking-date", {
+      dateFormat: "d.m.Y",
+      minDate: "today",
+      // Вимикаємо стандартну тему, щоб застосувати свою
+      disableMobile: true,
+      nextArrow:
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      prevArrow:
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    });
+  };
+
+  // Ініціалізація
+  initCalendar();
+
+  // Якщо ви будете використовувати HTMX для оновлення цієї частини сторінки:
+  document.body.addEventListener("htmx:afterSwap", () => {
+    initCalendar();
+  });
+</script>
+
+<style is:global>
+  /* Кастомна стилізація календаря під ваш макет */
+  .flatpickr-calendar {
+    background: #fff;
+    border: 1px solid #99a1b1;
+    border-radius: 12px;
+    box-shadow: none;
+    font-family: inherit;
+    padding: 16px;
+    width: 325px !important;
+  }
+
+  .flatpickr-months {
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(16, 24, 40, 0.2);
+    padding-bottom: 16px;
+  }
+
+  .flatpickr-month {
+    color: #101828;
+    font-weight: 600;
+  }
+
+  .flatpickr-current-month {
+    font-size: 16px;
+    font-weight: 600 !important;
+  }
+
+  /* Дні тижня (MON, TUE...) */
+  span.flatpickr-weekday {
+    color: #475467 !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+  }
+
+  /* Числа */
+  .flatpickr-day {
+    color: #475467;
+    border-radius: 50%;
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .flatpickr-day.nextMonthDay,
+  .flatpickr-day.prevMonthDay {
+    color: #99a1b1; /* Сірі числа попереднього місяця */
+  }
+
+  /* Вибраний день (Темне коло) */
+  .flatpickr-day.selected,
+  .flatpickr-day.selected:hover {
+    background: #475467 !important;
+    border-color: #475467 !important;
+    color: #fff !important;
+  }
+
+  .flatpickr-day:hover {
+    background: #f2f4f7;
+    border-color: transparent;
+  }
+</style>
+
+<style>
+  /* Стилі самої форми */
+  .booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    width: 100%;
+    padding: 18px;
+    background-color: #f7f7f7;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+  }
+
+  .input-group input::placeholder,
+  .input-group textarea::placeholder {
+    color: rgba(16, 24, 40, 0.6);
+  }
+
+  .send-btn {
+    background-color: #e44848;
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 200px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+  }
+
+  .send-btn:hover {
+    background-color: #d84343;
+  }
+</style>
