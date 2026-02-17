@@ -5,6 +5,7 @@ import { fetchCamperById } from "../../lib/api";
 import Icon from "../../components/Icon.astro";
 import type { Camper } from "../../types/camper";
 import BookingForm from "../../components/BookingForm.astro";
+import FavoriteButton from "../../components/FavoriteButton.jsx";
 
 // 1. Отримання ID та даних
 const { id } = Astro.params;
@@ -42,7 +43,7 @@ const {
   water,
 } = camper;
 
-// 3. Формування списку обладнання (тільки те, що є в наявності)
+// 3. Формування списку обладнання
 const features = [
   {
     condition: transmission,
@@ -65,7 +66,6 @@ const features = [
   { condition: water, label: "Water", icon: "water" },
 ].filter((f) => f.condition);
 
-// Допоміжна функція для гарного виводу типу кузова
 const formatForm = (text: string) =>
   text
     .replace(/([A-Z])/g, " $1")
@@ -90,7 +90,20 @@ const formatForm = (text: string) =>
               {location}
             </span>
           </div>
-          <p class="price">€{price.toLocaleString("en-IN")}.00</p>
+
+          <div class="price-wrapper">
+            <p class="price">€{price.toLocaleString("en-IN")}.00</p>
+            {/* Інтеграція вашого Preact компонента */}
+            <FavoriteButton
+              client:only="preact"
+              camper={camper}
+              className="details-fav-btn"
+            >
+              <div slot="fallback">
+                <Icon name="heart" size={24} />
+              </div>
+            </FavoriteButton>
+          </div>
         </div>
       </section>
 
@@ -109,20 +122,17 @@ const formatForm = (text: string) =>
         <p>{description}</p>
       </section>
 
-      {/* Основний контент (Дві колонки) */}
       <div class="main-grid">
-        {/* Ліва колонка: Характеристики */}
         <div class="content-left">
           <div class="tabs-nav">
             <button class="tab-link active" data-tab="features">Features</button
             >
-            <button class="tab-link" data-tab="reviews"
-              >Reviews ({reviews.length})</button
-            >
+            <button class="tab-link" data-tab="reviews">
+              Reviews ({reviews.length})
+            </button>
           </div>
 
           <div class="tab-container">
-            {/* Секція Features */}
             <div id="features-content" class="tab-pane active">
               <div class="badges-grid">
                 {
@@ -149,7 +159,6 @@ const formatForm = (text: string) =>
               </div>
             </div>
 
-            {/* Секція Reviews */}
             <div id="reviews-content" class="tab-pane">
               <div class="reviews-list">
                 {
@@ -185,12 +194,10 @@ const formatForm = (text: string) =>
           </div>
         </div>
 
-        {/* Права колонка: Форма бронювання */}
         <aside class="content-right">
           <div class="booking-card">
             <h3>Book your campervan now</h3>
             <p>Stay connected! We are always ready to help you.</p>
-
             <BookingForm />
           </div>
         </aside>
@@ -211,7 +218,6 @@ const formatForm = (text: string) =>
     padding: 0 16px;
   }
 
-  /* Header */
   .header h1 {
     font-size: 32px;
     font-weight: 600;
@@ -236,7 +242,9 @@ const formatForm = (text: string) =>
     display: flex;
     align-items: center;
     gap: 4px;
+    cursor: pointer;
   }
+
   .star-icon {
     color: #ffc107;
   }
@@ -245,12 +253,18 @@ const formatForm = (text: string) =>
     align-items: center;
     gap: 4px;
   }
+
+  .price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
   .price {
     font-size: 32px;
     font-weight: 600;
   }
 
-  /* Gallery */
   .gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -273,7 +287,6 @@ const formatForm = (text: string) =>
     max-width: 800px;
   }
 
-  /* Main Grid */
   .main-grid {
     display: grid;
     grid-template-columns: 1fr 448px;
@@ -281,7 +294,6 @@ const formatForm = (text: string) =>
     align-items: start;
   }
 
-  /* Tabs UI */
   .tabs-nav {
     display: flex;
     gap: 40px;
@@ -297,7 +309,7 @@ const formatForm = (text: string) =>
     border: none;
     cursor: pointer;
     position: relative;
-    color: var(--main);
+    color: #101828;
   }
 
   .tab-link.active::after {
@@ -310,16 +322,13 @@ const formatForm = (text: string) =>
     background-color: #e44848;
   }
 
-  /* Керування видимістю табів */
   .tab-pane {
     display: none;
   }
-
   .tab-pane.active {
     display: block;
   }
 
-  /* Стилі відгуків */
   .reviews-list {
     display: flex;
     flex-direction: column;
@@ -355,7 +364,6 @@ const formatForm = (text: string) =>
     display: flex;
     gap: 4px;
   }
-
   .star-active {
     color: #ffc107;
   }
@@ -369,7 +377,6 @@ const formatForm = (text: string) =>
     color: #475467;
   }
 
-  /* Badges */
   .badges-grid {
     display: flex;
     flex-wrap: wrap;
@@ -388,7 +395,6 @@ const formatForm = (text: string) =>
     font-weight: 500;
   }
 
-  /* Vehicle Details */
   .details-block h3 {
     font-size: 20px;
     font-weight: 600;
@@ -416,7 +422,6 @@ const formatForm = (text: string) =>
     font-weight: 500;
   }
 
-  /* Booking Card Placeholder */
   .booking-card {
     border: 1px solid rgba(16, 24, 40, 0.2);
     border-radius: 10px;
@@ -431,16 +436,6 @@ const formatForm = (text: string) =>
     color: #475467;
     margin-bottom: 24px;
   }
-
-  .form-placeholder {
-    height: 300px;
-    background-color: #f7f7f7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
-  }
 </style>
 
 <script>
@@ -451,21 +446,14 @@ const formatForm = (text: string) =>
     tabs.forEach((tab) => {
       tab.addEventListener("click", () => {
         const target = tab.getAttribute("data-tab");
-
-        // Видаляємо active у всіх кнопок і панелей
         tabs.forEach((t) => t.classList.remove("active"));
         panes.forEach((p) => p.classList.remove("active"));
-
-        // Додаємо active поточній кнопці та відповідній панелі
         tab.classList.add("active");
         document.getElementById(`${target}-content`)?.classList.add("active");
       });
     });
   }
 
-  // Запуск при завантаженні
   initTabs();
-
-  // Для підтримки HTMX (якщо сторінка оновлюється частково)
   document.body.addEventListener("htmx:afterSwap", initTabs);
 </script>
