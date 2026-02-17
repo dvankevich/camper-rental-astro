@@ -40,6 +40,13 @@ export async function fetchCampers(params = {}) {
   }
 }
 
+// src/lib/api.js
+/** @typedef { import('../types').Camper } Camper */
+
+/**
+ * @param {string} id
+ * @returns {Promise<Camper | null>}
+ */
 export async function fetchCamperById(id) {
   try {
     const res = await fetch(`${API_URL}/${id}`);

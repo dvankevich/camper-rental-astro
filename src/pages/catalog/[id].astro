@@ -1,0 +1,348 @@
+---
+// src/pages/catalog/[id].astro
+import Layout from "../../layouts/Layout.astro";
+import { fetchCamperById } from "../../lib/api";
+import Icon from "../../components/Icon.astro";
+import type { Camper } from "../../types/camper";
+
+// 1. Отримання ID та даних
+const { id } = Astro.params;
+const camper: Camper | null = await fetchCamperById(id as string);
+
+// 2. Обробка відсутності даних
+if (!camper) {
+  return Astro.redirect("/catalog");
+}
+
+const {
+  name,
+  price,
+  rating,
+  location,
+  description,
+  gallery,
+  reviews,
+  form,
+  length,
+  width,
+  height,
+  tank,
+  consumption,
+  transmission,
+  engine,
+  AC,
+  bathroom,
+  kitchen,
+  TV,
+  radio,
+  refrigerator,
+  microwave,
+  gas,
+  water,
+} = camper;
+
+// 3. Формування списку обладнання (тільки те, що є в наявності)
+const features = [
+  {
+    condition: transmission,
+    label: transmission.charAt(0).toUpperCase() + transmission.slice(1),
+    icon: "transmission",
+  },
+  {
+    condition: engine,
+    label: engine.charAt(0).toUpperCase() + engine.slice(1),
+    icon: "engine",
+  },
+  { condition: AC, label: "AC", icon: "ac" },
+  { condition: bathroom, label: "Bathroom", icon: "bathroom" },
+  { condition: kitchen, label: "Kitchen", icon: "kitchen" },
+  { condition: TV, label: "TV", icon: "tv" },
+  { condition: radio, label: "Radio", icon: "radio" },
+  { condition: refrigerator, label: "Refrigerator", icon: "refrigerator" },
+  { condition: microwave, label: "Microwave", icon: "microwave" },
+  { condition: gas, label: "Gas", icon: "gas" },
+  { condition: water, label: "Water", icon: "water" },
+].filter((f) => f.condition);
+
+// Допоміжна функція для гарного виводу типу кузова
+const formatForm = (text: string) =>
+  text
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim();
+---
+
+<Layout title={name}>
+  <main class="details-page">
+    <div class="container">
+      {/* Шапка */}
+      <section class="header">
+        <h1>{name}</h1>
+        <div class="meta-info">
+          <div class="rating-location">
+            <span class="rating">
+              <Icon name="starfull" size={16} class="star-icon" />
+              {rating} ({reviews.length} Reviews)
+            </span>
+            <span class="location">
+              <Icon name="map" size={16} />
+              {location}
+            </span>
+          </div>
+          <p class="price">€{price.toLocaleString("en-IN")}.00</p>
+        </div>
+      </section>
+
+      {/* Галерея */}
+      <section class="gallery">
+        {
+          gallery.map((img) => (
+            <div class="gallery-item">
+              <img src={img.original} alt={name} />
+            </div>
+          ))
+        }
+      </section>
+
+      <section class="description-section">
+        <p>{description}</p>
+      </section>
+
+      {/* Основний контент (Дві колонки) */}
+      <div class="main-grid">
+        {/* Ліва колонка: Характеристики */}
+        <div class="content-left">
+          <div class="tabs-nav">
+            <button class="tab-link active">Features</button>
+            <button class="tab-link">Reviews</button>
+          </div>
+
+          <div class="features-content">
+            {/* Бейджі з іконками */}
+            <div class="badges-grid">
+              {
+                features.map((f) => (
+                  <div class="badge">
+                    <Icon name={f.icon} size={20} />
+                    <span>{f.label}</span>
+                  </div>
+                ))
+              }
+            </div>
+
+            {/* Технічні деталі */}
+            <div class="details-block">
+              <h3>Vehicle details</h3>
+              <div class="divider"></div>
+              <ul class="details-list">
+                <li><span>Form</span> <span>{formatForm(form)}</span></li>
+                <li><span>Length</span> <span>{length}</span></li>
+                <li><span>Width</span> <span>{width}</span></li>
+                <li><span>Height</span> <span>{height}</span></li>
+                <li><span>Tank</span> <span>{tank}</span></li>
+                <li><span>Consumption</span> <span>{consumption}</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Права колонка: Форма бронювання */}
+        <aside class="content-right">
+          <div class="booking-card">
+            <h3>Book your campervan now</h3>
+            <p>Stay connected! We are always ready to help you.</p>
+
+            {/* Тут буде компонент BookingForm */}
+            <div class="form-placeholder">
+              <p>Booking Form Component will be here</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .details-page {
+    padding: 40px 0 80px;
+    color: #101828;
+  }
+
+  .container {
+    max-width: 1216px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* Header */
+  .header h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .rating-location {
+    display: flex;
+    gap: 16px;
+    font-size: 16px;
+  }
+
+  .rating {
+    text-decoration: underline;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .star-icon {
+    color: #ffc107;
+  }
+  .location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .price {
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  /* Gallery */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 310px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .description-section {
+    font-size: 18px;
+    line-height: 1.5;
+    color: #475467;
+    margin-bottom: 44px;
+    max-width: 800px;
+  }
+
+  /* Main Grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 448px;
+    gap: 64px;
+    align-items: start;
+  }
+
+  /* Tabs UI */
+  .tabs-nav {
+    display: flex;
+    gap: 40px;
+    border-bottom: 1px solid rgba(16, 24, 40, 0.2);
+    margin-bottom: 44px;
+  }
+
+  .tab-link {
+    font-size: 20px;
+    font-weight: 600;
+    padding-bottom: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .tab-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: #e44848;
+  }
+
+  /* Badges */
+  .badges-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 44px;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background-color: #f2f4f7;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  /* Vehicle Details */
+  .details-block h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .divider {
+    height: 1px;
+    background-color: rgba(16, 24, 40, 0.1);
+    margin-bottom: 24px;
+  }
+
+  .details-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .details-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  /* Booking Card Placeholder */
+  .booking-card {
+    border: 1px solid rgba(16, 24, 40, 0.2);
+    border-radius: 10px;
+    padding: 24px;
+  }
+
+  .booking-card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .booking-card p {
+    color: #475467;
+    margin-bottom: 24px;
+  }
+
+  .form-placeholder {
+    height: 300px;
+    background-color: #f7f7f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+  }
+</style>
