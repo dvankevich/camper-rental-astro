@@ -9,9 +9,7 @@ import FavoriteButton from "../../components/FavoriteButton.jsx";
 const { id } = Astro.params;
 const camper: Camper | null = await fetchCamperById(id as string);
 
-if (!camper) {
-  return Astro.redirect("/catalog");
-}
+if (!camper) return Astro.redirect("/catalog");
 
 const {
   name,
@@ -72,6 +70,7 @@ const formatForm = (text: string) =>
 <Layout title={name}>
   <main class="details-page">
     <div class="container">
+      {/* 1. Header Section */}
       <section class="header">
         <h1>{name}</h1>
         <div class="meta-info">
@@ -98,6 +97,7 @@ const formatForm = (text: string) =>
         </div>
       </section>
 
+      {/* 2. Gallery Section */}
       <section class="gallery">
         {
           gallery.slice(0, 3).map((img) => (
@@ -108,84 +108,85 @@ const formatForm = (text: string) =>
         }
       </section>
 
+      {/* 3. Description Section */}
       <section class="description-section">
         <p>{description}</p>
       </section>
 
-      <div class="main-grid">
+      {/* 4. Tabs Navigation (ЗВЕРХУ СІТКИ, як у React) */}
+      <div class="tabs-nav" role="tablist">
+        <button class="tab-link active" data-tab="features" role="tab"
+          >Features</button
+        >
+        <button class="tab-link" data-tab="reviews" role="tab"
+          >Reviews ({reviews.length})</button
+        >
+      </div>
+
+      {/* 5. Main Layout Grid (Content + Sidebar) */}
+      <div class="main-layout">
         <div class="content-left">
-          <div class="tabs-nav">
-            <button class="tab-link active" data-tab="features">Features</button
-            >
-            <button class="tab-link" data-tab="reviews"
-              >Reviews ({reviews.length})</button
-            >
-          </div>
-
-          <div class="tab-container">
-            <div id="features-content" class="tab-pane active">
-              <div class="features-inner-card">
-                <div class="badges-grid">
-                  {
-                    features.map((f) => (
-                      <div class="badge">
-                        <Icon name={f.icon} size={20} />
-                        <span>{f.label}</span>
-                      </div>
-                    ))
-                  }
-                </div>
-
-                <div class="details-block">
-                  <h3>Vehicle details</h3>
-                  <ul class="details-list">
-                    <li><span>Form</span> <span>{formatForm(form)}</span></li>
-                    <li><span>Length</span> <span>{length}</span></li>
-                    <li><span>Width</span> <span>{width}</span></li>
-                    <li><span>Height</span> <span>{height}</span></li>
-                    <li><span>Tank</span> <span>{tank}</span></li>
-                    <li><span>Consumption</span> <span>{consumption}</span></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div id="reviews-content" class="tab-pane">
-              <div class="reviews-list">
+          <div id="features-content" class="tab-pane active">
+            <div class="features-inner-card">
+              <div class="badges-grid">
                 {
-                  reviews.map((review) => (
-                    <div class="review-item">
-                      <div class="review-header">
-                        <div class="avatar">
-                          {review.reviewer_name.charAt(0)}
-                        </div>
-                        <div class="reviewer-info">
-                          <p class="reviewer-name">{review.reviewer_name}</p>
-                          <div class="stars">
-                            {[...Array(5)].map((_, i) => (
-                              <Icon
-                                name="starfull"
-                                size={16}
-                                class={
-                                  i < review.reviewer_rating
-                                    ? "star-active"
-                                    : "star-empty"
-                                }
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <p class="review-comment">{review.comment}</p>
+                  features.map((f) => (
+                    <div class="badge">
+                      <Icon name={f.icon} size={20} />
+                      <span>{f.label}</span>
                     </div>
                   ))
                 }
               </div>
+
+              <div class="details-block">
+                <h3>Vehicle details</h3>
+                <ul class="details-list">
+                  <li><span>Form</span> <span>{formatForm(form)}</span></li>
+                  <li><span>Length</span> <span>{length}</span></li>
+                  <li><span>Width</span> <span>{width}</span></li>
+                  <li><span>Height</span> <span>{height}</span></li>
+                  <li><span>Tank</span> <span>{tank}</span></li>
+                  <li><span>Consumption</span> <span>{consumption}</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="reviews-content" class="tab-pane">
+            <div class="reviews-list">
+              {
+                reviews.map((review) => (
+                  <div class="review-item">
+                    <div class="review-header">
+                      <div class="avatar">{review.reviewer_name.charAt(0)}</div>
+                      <div class="reviewer-info">
+                        <p class="reviewer-name">{review.reviewer_name}</p>
+                        <div class="stars">
+                          {[...Array(5)].map((_, i) => (
+                            <Icon
+                              name="starfull"
+                              size={16}
+                              class={
+                                i < review.reviewer_rating
+                                  ? "star-active"
+                                  : "star-empty"
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p class="review-comment">{review.comment}</p>
+                  </div>
+                ))
+              }
             </div>
           </div>
         </div>
 
-        <aside class="content-right">
+        {/* 6. Sidebar Right */}
+        <aside class="booking-sidebar">
           <BookingForm />
         </aside>
       </div>
@@ -204,6 +205,7 @@ const formatForm = (text: string) =>
     padding: 0 16px;
   }
 
+  /* Header */
   .header h1 {
     font-size: 32px;
     font-weight: 600;
@@ -234,7 +236,6 @@ const formatForm = (text: string) =>
     align-items: center;
     gap: 4px;
   }
-
   .price-wrapper {
     display: flex;
     align-items: center;
@@ -245,6 +246,7 @@ const formatForm = (text: string) =>
     font-weight: 600;
   }
 
+  /* Gallery */
   .gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -258,21 +260,15 @@ const formatForm = (text: string) =>
     border-radius: 10px;
   }
 
+  /* Description */
   .description-section {
     font-size: 18px;
     line-height: 1.5;
     color: #475467;
     margin-bottom: 44px;
-    max-width: 100%;
   }
 
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 448px;
-    gap: 64px;
-    align-items: start;
-  }
-
+  /* TABS NAV - Тепер вона над усім нижнім блоком */
   .tabs-nav {
     display: flex;
     gap: 40px;
@@ -292,13 +288,22 @@ const formatForm = (text: string) =>
   .tab-link.active::after {
     content: "";
     position: absolute;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
     width: 100%;
     height: 5px;
     background-color: #e44848;
   }
 
+  /* MAIN LAYOUT GRID */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 448px;
+    gap: 64px;
+    align-items: start;
+  }
+
+  /* Tab Panes */
   .tab-pane {
     display: none;
   }
@@ -306,7 +311,6 @@ const formatForm = (text: string) =>
     display: block;
   }
 
-  /* Світло-сіра підкладка для Features */
   .features-inner-card {
     background-color: #f7f7f7;
     padding: 40px;
@@ -323,7 +327,7 @@ const formatForm = (text: string) =>
     align-items: center;
     gap: 8px;
     padding: 12px 18px;
-    background-color: #f2f4f7;
+    background-color: #fff;
     border-radius: 100px;
     font-size: 16px;
     font-weight: 500;
