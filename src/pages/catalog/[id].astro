@@ -1,5 +1,4 @@
 ---
-// src/pages/catalog/[id].astro
 import Layout from "../../layouts/Layout.astro";
 import { fetchCamperById } from "../../lib/api";
 import Icon from "../../components/Icon.astro";
@@ -7,11 +6,9 @@ import type { Camper } from "../../types/camper";
 import BookingForm from "../../components/BookingForm.astro";
 import FavoriteButton from "../../components/FavoriteButton.jsx";
 
-// 1. Отримання ID та даних
 const { id } = Astro.params;
 const camper: Camper | null = await fetchCamperById(id as string);
 
-// 2. Обробка відсутності даних
 if (!camper) {
   return Astro.redirect("/catalog");
 }
@@ -43,7 +40,6 @@ const {
   water,
 } = camper;
 
-// 3. Формування списку обладнання
 const features = [
   {
     condition: transmission,
@@ -76,7 +72,6 @@ const formatForm = (text: string) =>
 <Layout title={name}>
   <main class="details-page">
     <div class="container">
-      {/* Шапка */}
       <section class="header">
         <h1>{name}</h1>
         <div class="meta-info">
@@ -90,27 +85,22 @@ const formatForm = (text: string) =>
               {location}
             </span>
           </div>
-
           <div class="price-wrapper">
             <p class="price">€{price.toLocaleString("en-IN")}.00</p>
-            {/* Інтеграція вашого Preact компонента */}
             <FavoriteButton
               client:only="preact"
               camper={camper}
               className="details-fav-btn"
             >
-              <div slot="fallback">
-                <Icon name="heart" size={24} />
-              </div>
+              <div slot="fallback"><Icon name="heart" size={24} /></div>
             </FavoriteButton>
           </div>
         </div>
       </section>
 
-      {/* Галерея */}
       <section class="gallery">
         {
-          gallery.map((img) => (
+          gallery.slice(0, 3).map((img) => (
             <div class="gallery-item">
               <img src={img.original} alt={name} />
             </div>
@@ -127,35 +117,36 @@ const formatForm = (text: string) =>
           <div class="tabs-nav">
             <button class="tab-link active" data-tab="features">Features</button
             >
-            <button class="tab-link" data-tab="reviews">
-              Reviews ({reviews.length})
-            </button>
+            <button class="tab-link" data-tab="reviews"
+              >Reviews ({reviews.length})</button
+            >
           </div>
 
           <div class="tab-container">
             <div id="features-content" class="tab-pane active">
-              <div class="badges-grid">
-                {
-                  features.map((f) => (
-                    <div class="badge">
-                      <Icon name={f.icon} size={20} />
-                      <span>{f.label}</span>
-                    </div>
-                  ))
-                }
-              </div>
+              <div class="features-inner-card">
+                <div class="badges-grid">
+                  {
+                    features.map((f) => (
+                      <div class="badge">
+                        <Icon name={f.icon} size={20} />
+                        <span>{f.label}</span>
+                      </div>
+                    ))
+                  }
+                </div>
 
-              <div class="details-block">
-                <h3>Vehicle details</h3>
-                <div class="divider"></div>
-                <ul class="details-list">
-                  <li><span>Form</span> <span>{formatForm(form)}</span></li>
-                  <li><span>Length</span> <span>{length}</span></li>
-                  <li><span>Width</span> <span>{width}</span></li>
-                  <li><span>Height</span> <span>{height}</span></li>
-                  <li><span>Tank</span> <span>{tank}</span></li>
-                  <li><span>Consumption</span> <span>{consumption}</span></li>
-                </ul>
+                <div class="details-block">
+                  <h3>Vehicle details</h3>
+                  <ul class="details-list">
+                    <li><span>Form</span> <span>{formatForm(form)}</span></li>
+                    <li><span>Length</span> <span>{length}</span></li>
+                    <li><span>Width</span> <span>{width}</span></li>
+                    <li><span>Height</span> <span>{height}</span></li>
+                    <li><span>Tank</span> <span>{tank}</span></li>
+                    <li><span>Consumption</span> <span>{consumption}</span></li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -195,11 +186,7 @@ const formatForm = (text: string) =>
         </div>
 
         <aside class="content-right">
-          <div class="booking-card">
-            <h3>Book your campervan now</h3>
-            <p>Stay connected! We are always ready to help you.</p>
-            <BookingForm />
-          </div>
+          <BookingForm />
         </aside>
       </div>
     </div>
@@ -211,7 +198,6 @@ const formatForm = (text: string) =>
     padding: 40px 0 80px;
     color: #101828;
   }
-
   .container {
     max-width: 1216px;
     margin: 0 auto;
@@ -223,28 +209,23 @@ const formatForm = (text: string) =>
     font-weight: 600;
     margin-bottom: 10px;
   }
-
   .meta-info {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
     margin-bottom: 28px;
   }
-
   .rating-location {
     display: flex;
     gap: 16px;
     font-size: 16px;
   }
-
   .rating {
     text-decoration: underline;
     display: flex;
     align-items: center;
     gap: 4px;
-    cursor: pointer;
   }
-
   .star-icon {
     color: #ffc107;
   }
@@ -259,7 +240,6 @@ const formatForm = (text: string) =>
     align-items: center;
     gap: 12px;
   }
-
   .price {
     font-size: 32px;
     font-weight: 600;
@@ -271,7 +251,6 @@ const formatForm = (text: string) =>
     gap: 16px;
     margin-bottom: 40px;
   }
-
   .gallery-item img {
     width: 100%;
     height: 310px;
@@ -284,7 +263,7 @@ const formatForm = (text: string) =>
     line-height: 1.5;
     color: #475467;
     margin-bottom: 44px;
-    max-width: 800px;
+    max-width: 100%;
   }
 
   .main-grid {
@@ -297,10 +276,9 @@ const formatForm = (text: string) =>
   .tabs-nav {
     display: flex;
     gap: 40px;
-    border-bottom: 1px solid rgba(16, 24, 40, 0.2);
+    border-bottom: 1px solid rgba(16, 24, 40, 0.1);
     margin-bottom: 44px;
   }
-
   .tab-link {
     font-size: 20px;
     font-weight: 600;
@@ -311,7 +289,6 @@ const formatForm = (text: string) =>
     position: relative;
     color: #101828;
   }
-
   .tab-link.active::after {
     content: "";
     position: absolute;
@@ -329,61 +306,18 @@ const formatForm = (text: string) =>
     display: block;
   }
 
-  .reviews-list {
-    display: flex;
-    flex-direction: column;
-    gap: 44px;
+  /* Світло-сіра підкладка для Features */
+  .features-inner-card {
+    background-color: #f7f7f7;
+    padding: 40px;
+    border-radius: 10px;
   }
-
-  .review-header {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-
-  .avatar {
-    width: 60px;
-    height: 60px;
-    background-color: #f2f4f7;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 600;
-    color: #e44848;
-  }
-
-  .reviewer-name {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  .stars {
-    display: flex;
-    gap: 4px;
-  }
-  .star-active {
-    color: #ffc107;
-  }
-  .star-empty {
-    color: #f2f4f7;
-  }
-
-  .review-comment {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #475467;
-  }
-
   .badges-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 44px;
   }
-
   .badge {
     display: flex;
     align-items: center;
@@ -399,22 +333,16 @@ const formatForm = (text: string) =>
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 24px;
+    border-bottom: 1px solid rgba(16, 24, 40, 0.1);
+    padding-bottom: 24px;
   }
-
-  .divider {
-    height: 1px;
-    background-color: rgba(16, 24, 40, 0.1);
-    margin-bottom: 24px;
-  }
-
   .details-list {
     list-style: none;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
   }
-
   .details-list li {
     display: flex;
     justify-content: space-between;
@@ -422,19 +350,48 @@ const formatForm = (text: string) =>
     font-weight: 500;
   }
 
-  .booking-card {
-    border: 1px solid rgba(16, 24, 40, 0.2);
-    border-radius: 10px;
-    padding: 24px;
+  /* Reviews */
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
   }
-
-  .booking-card h3 {
-    font-size: 20px;
-    margin-bottom: 8px;
+  .review-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
   }
-  .booking-card p {
+  .avatar {
+    width: 60px;
+    height: 60px;
+    background-color: #f2f4f7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #e44848;
+  }
+  .reviewer-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .stars {
+    display: flex;
+    gap: 4px;
+  }
+  .star-active {
+    color: #ffc107;
+  }
+  .star-empty {
+    color: #f2f4f7;
+  }
+  .review-comment {
+    font-size: 16px;
+    line-height: 1.5;
     color: #475467;
-    margin-bottom: 24px;
   }
 </style>
 
@@ -442,7 +399,6 @@ const formatForm = (text: string) =>
   function initTabs() {
     const tabs = document.querySelectorAll(".tab-link");
     const panes = document.querySelectorAll(".tab-pane");
-
     tabs.forEach((tab) => {
       tab.addEventListener("click", () => {
         const target = tab.getAttribute("data-tab");
@@ -453,7 +409,6 @@ const formatForm = (text: string) =>
       });
     });
   }
-
   initTabs();
   document.body.addEventListener("htmx:afterSwap", initTabs);
 </script>
