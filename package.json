@@ -14,6 +14,7 @@
     "astro": "^5.17.2",
     "astro-icon": "^1.1.5",
     "clsx": "^2.1.1",
+    "flatpickr": "^4.6.13",
     "htmx.org": "^2.0.8",
     "iconify-icon": "^3.0.2",
     "modern-normalize": "^3.0.1",

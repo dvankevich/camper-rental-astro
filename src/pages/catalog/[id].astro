@@ -4,6 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import { fetchCamperById } from "../../lib/api";
 import Icon from "../../components/Icon.astro";
 import type { Camper } from "../../types/camper";
+import BookingForm from "../../components/BookingForm.astro";
 
 // 1. Отримання ID та даних
 const { id } = Astro.params;
@@ -152,10 +153,7 @@ const formatForm = (text: string) =>
             <h3>Book your campervan now</h3>
             <p>Stay connected! We are always ready to help you.</p>
 
-            {/* Тут буде компонент BookingForm */}
-            <div class="form-placeholder">
-              <p>Booking Form Component will be here</p>
-            </div>
+            <BookingForm />
           </div>
         </aside>
       </div>
