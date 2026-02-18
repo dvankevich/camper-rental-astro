@@ -1,5 +1,5 @@
 ---
-
+/* BookingForm.astro */
 ---
 
 <div class="booking-card">
@@ -46,12 +46,13 @@
     flatpickr("#booking-date", {
       dateFormat: "d.m.Y",
       minDate: "today",
+      // ВИПРАВЛЕНО: Робимо вибір місяця статичним текстом (без випадаючого списку)
+      monthSelectorType: "static",
       locale: { firstDayOfWeek: 1 },
-      // Кастомні стрілки як на макеті
       nextArrow:
-        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#101828" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>',
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       prevArrow:
-        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#101828" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>',
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     });
   };
 
@@ -71,48 +72,32 @@
     margin-top: 12px;
   }
 
-  /* Стрілка вгорі (хвостик) */
+  /* Стрілка-покажчик вгорі */
   .flatpickr-calendar.arrowTop:before,
   .flatpickr-calendar.arrowTop:after {
     border-bottom-color: rgba(16, 24, 40, 0.2) !important;
   }
 
-  /* ШАПКА (Місяць та Рік) */
-  .flatpickr-months .flatpickr-month {
-    color: #101828 !important;
-    fill: #101828 !important;
-    height: 48px;
-  }
-
+  /* ШАПКА: Прибираємо стилі стандартних селектів */
   .flatpickr-current-month {
     font-size: 16px !important;
     font-weight: 600 !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    color: #101828 !important;
     padding: 0 !important;
   }
 
-  .flatpickr-current-month .flatpickr-monthDropdown-months {
+  .flatpickr-current-month .flatpickr-monthDropdown-months,
+  .flatpickr-monthDropdown-month {
     font-weight: 600 !important;
-    color: #101828 !important;
+    background: transparent !important;
+    pointer-events: none; /* Вимикаємо клік на назву місяця */
   }
 
-  /* Стрілки навігації */
-  .flatpickr-months .flatpickr-prev-month,
-  .flatpickr-months .flatpickr-next-month {
-    padding: 10px !important;
-    top: 10px !important;
-  }
+  .numInputWrapper span {
+    display: none;
+  } /* Ховаємо стрілки року */
 
-  .flatpickr-months .flatpickr-prev-month svg,
-  .flatpickr-months .flatpickr-next-month svg {
-    width: 24px !important;
-    height: 24px !important;
-    fill: #101828 !important;
-  }
-
-  /* ДНІ ТИЖНЯ (MON, TUE...) */
+  /* ДНІ ТИЖНЯ */
   .flatpickr-weekdays {
     height: 40px !important;
     border-bottom: 1px solid rgba(16, 24, 40, 0.1);
@@ -127,36 +112,16 @@
   }
 
   /* СІТКА ДНІВ */
-  .flatpickr-days {
-    width: 295px !important;
-  }
-
   .flatpickr-day {
     font-size: 14px !important;
-    font-weight: 400 !important;
-    color: #101828 !important;
     border-radius: 50% !important;
-    height: 38px !important;
-    line-height: 38px !important;
-    margin: 2px !important;
   }
 
-  /* Вибраний день (Темне коло) */
-  .flatpickr-day.selected,
-  .flatpickr-day.selected:hover {
-    background: #475467 !important; /* Колір зі скриншота */
+  /* ВИБРАНИЙ ДЕНЬ */
+  .flatpickr-day.selected {
+    background: #475467 !important;
     border-color: #475467 !important;
     color: #fff !important;
-  }
-
-  /* Дні іншого місяця */
-  .flatpickr-day.prevMonthDay,
-  .flatpickr-day.nextMonthDay {
-    color: rgba(16, 24, 40, 0.4) !important;
-  }
-
-  .flatpickr-day:hover {
-    background: #f2f4f7 !important;
   }
 </style>
 
@@ -166,6 +131,9 @@
     border-radius: 12px;
     padding: 44px;
     background-color: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   h3 {
@@ -197,13 +165,18 @@
     color: #101828;
   }
 
+  .input-group textarea {
+    resize: none;
+  }
+
   .input-group input::placeholder,
   .input-group textarea::placeholder {
     color: rgba(16, 24, 40, 0.6);
   }
 
+  /* ВИПРАВЛЕНО: Кнопка по центру */
   .send-btn {
-    align-self: flex-start; /* Кнопка зліва як на макеті */
+    align-self: center;
     background-color: #e44848;
     color: white;
     padding: 16px 60px;
