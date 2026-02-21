@@ -1,11 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { fetchCamperById } from "../../lib/api";
-import Icon from "../../components/Icon.astro";
 import type { Camper } from "../../types/camper";
 import BookingForm from "../../components/BookingForm.astro";
-import FavoriteButton from "../../components/FavoriteButton.jsx";
 import CamperHeader from "../../components/details/CamperHeader.astro";
+import CamperGallery from "../../components/details/CamperGallery.astro";
 import CamperFeatures from "../../components/details/CamperFeatures.astro";
 import CamperReviews from "../../components/details/CamperReviews.astro";
 
@@ -75,7 +74,7 @@ const formatForm = (text: string) =>
     <div class="container">
       <CamperHeader camper={camper} />
 
-      <section class="gallery">{/* Можна теж винести */}</section>
+      <CamperGallery gallery={gallery} name={name} />
 
       <section class="description-section">
         <p>{description}</p>
@@ -120,65 +119,11 @@ const formatForm = (text: string) =>
     padding: 40px 0 80px;
     color: #101828;
   }
+
   .container {
     max-width: 1216px;
     margin: 0 auto;
     padding: 0 16px;
-  }
-
-  /* Header */
-  .header h1 {
-    font-size: 32px;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-  .meta-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-  .rating-location {
-    display: flex;
-    gap: 16px;
-    font-size: 16px;
-  }
-  .rating {
-    text-decoration: underline;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .star-icon {
-    color: #ffc107;
-  }
-  .location {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .price-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .price {
-    font-size: 32px;
-    font-weight: 600;
-  }
-
-  /* Gallery */
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 40px;
-  }
-  .gallery-item img {
-    width: 100%;
-    height: 310px;
-    object-fit: cover;
-    border-radius: 10px;
   }
 
   /* Description */
@@ -196,6 +141,7 @@ const formatForm = (text: string) =>
     border-bottom: 1px solid rgba(16, 24, 40, 0.1);
     margin-bottom: 44px;
   }
+
   .tab-link {
     font-size: 20px;
     font-weight: 600;
@@ -206,6 +152,7 @@ const formatForm = (text: string) =>
     position: relative;
     color: #101828;
   }
+
   .tab-link.active::after {
     content: "";
     position: absolute;
@@ -219,17 +166,14 @@ const formatForm = (text: string) =>
   /* MAIN LAYOUT GRID */
   .main-layout {
     display: grid;
-    /* Права колонка буде приблизно на 1.6% ширшою за ліву */
     grid-template-columns: 1fr 1.016fr;
     gap: 40px;
     align-items: stretch;
   }
 
-  /* Content Left */
   .content-left {
     display: flex;
     flex-direction: column;
-    /* Контейнер має займати всю доступну висоту */
     height: 100%;
   }
 
@@ -237,82 +181,12 @@ const formatForm = (text: string) =>
   .tab-pane {
     display: none;
   }
+
   .tab-pane.active {
-    /* ВИПРАВЛЕНО: робимо таб гнучким контейнером на всю висоту */
-    display: flex;
-    flex-direction: column;
-    /* Змушуємо активний таб розтягуватися */
-    flex-grow: 1;
-    height: 100%;
-  }
-
-  /* ЛІВА КАРТКА (FEATURES) */
-  .features-inner-card {
-    background-color: #f7f7f7;
-    padding: 40px;
-    border-radius: 10px;
-    /* ВИПРАВЛЕНО: Flexbox для керування внутрішнім простором */
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     height: 100%;
-  }
-
-  .badges-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    /* Прибираємо фіксований відступ, щоб margin-top: auto працював коректно */
-    margin-bottom: 0;
-  }
-
-  .badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 18px;
-    background-color: #f2f4f7;
-    border-radius: 100px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #101828;
-  }
-
-  /* Vehicle Details */
-  .details-block {
-    /* ВИПРАВЛЕНО: margin-top: auto виштовхує блок до низу, створюючи пустий простір */
-    margin-top: auto;
-    padding-top: 44px; /* Мінімальна відстань, якщо контенту забагато */
-  }
-
-  .details-block h3 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    border-bottom: 1px solid rgba(16, 24, 40, 0.1);
-    padding-bottom: 24px;
-  }
-
-  .details-list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .details-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 18px;
-    font-weight: 500;
-  }
-
-  /* Reviews */
-  .reviews-list {
-    display: flex;
-    flex-direction: column;
-    gap: 44px;
   }
 
   /* Sidebar */
@@ -320,77 +194,6 @@ const formatForm = (text: string) =>
     display: flex;
     flex-direction: column;
     height: 100%;
-  }
-
-  .stars {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 16px;
-  }
-
-  /* Використовуємо каскад, щоб точно "перебити" стандартний чорний колір */
-  .stars :global(svg.star-active) {
-    fill: var(--rating, #ffc107) !important;
-    color: var(--rating, #ffc107) !important;
-  }
-
-  .stars :global(svg.star-empty) {
-    fill: var(--badges, #f2f4f7) !important;
-    color: var(--badges, #f2f4f7) !important;
-  }
-
-  /* Головний контейнер: Аватар зліва, блок тексту справа */
-  .review-header {
-    display: flex;
-    gap: 16px; /* Відступ між аватаром та текстом */
-    align-items: center; /* Вирівнювання по вертикалі */
-    justify-content: left;
-    margin-bottom: 16px;
-  }
-
-  /* Блок з інформацією: Ім'я зверху, зірочки знизу */
-  .reviewer-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; /* Відступ між ім'ям та зірочками */
-  }
-
-  .reviewer-name {
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 1.3;
-    margin: 0; /* Прибираємо дефолтні відступи параграфа */
-  }
-
-  /* Ваш існуючий аватар (оновлений) */
-  .avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: var(--badges, #f2f4f7);
-    color: var(--button, #e44848);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 1;
-    text-transform: uppercase;
-    flex-shrink: 0; /* Щоб аватар не стискався, якщо ім'я довге */
-  }
-
-  .stars {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 0;
-  }
-
-  .stars :global(.star-active) {
-    fill: var(--rating, #ffc107) !important;
-  }
-
-  .stars :global(.star-empty) {
-    fill: var(--badges, #f2f4f7) !important;
   }
 </style>
 

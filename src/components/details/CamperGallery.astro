@@ -1,0 +1,28 @@
+---
+const { gallery, name } = Astro.props;
+---
+
+<section class="gallery">
+  {
+    gallery.slice(0, 3).map((img: any) => (
+      <div class="gallery-item">
+        <img src={img.original} alt={name} />
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 310px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+</style>
