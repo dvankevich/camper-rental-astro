@@ -165,7 +165,11 @@ const formatForm = (text: string) =>
                         <div class="stars">
                           {[...Array(5)].map((_, i) => (
                             <Icon
-                              name="starfull"
+                              name={
+                                i < review.reviewer_rating
+                                  ? "starfull"
+                                  : "starempty"
+                              }
                               size={16}
                               class={
                                 i < review.reviewer_rating
@@ -399,6 +403,23 @@ const formatForm = (text: string) =>
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+
+  .stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  /* Використовуємо каскад, щоб точно "перебити" стандартний чорний колір */
+  .stars :global(svg.star-active) {
+    fill: var(--rating, #ffc107) !important;
+    color: var(--rating, #ffc107) !important;
+  }
+
+  .stars :global(svg.star-empty) {
+    fill: var(--badges, #f2f4f7) !important;
+    color: var(--badges, #f2f4f7) !important;
   }
 </style>
 
