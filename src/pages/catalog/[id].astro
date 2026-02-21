@@ -421,6 +421,60 @@ const formatForm = (text: string) =>
     fill: var(--badges, #f2f4f7) !important;
     color: var(--badges, #f2f4f7) !important;
   }
+
+  /* Головний контейнер: Аватар зліва, блок тексту справа */
+  .review-header {
+    display: flex;
+    gap: 16px; /* Відступ між аватаром та текстом */
+    align-items: center; /* Вирівнювання по вертикалі */
+    justify-content: left;
+    margin-bottom: 16px;
+  }
+
+  /* Блок з інформацією: Ім'я зверху, зірочки знизу */
+  .reviewer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Відступ між ім'ям та зірочками */
+  }
+
+  .reviewer-name {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0; /* Прибираємо дефолтні відступи параграфа */
+  }
+
+  /* Ваш існуючий аватар (оновлений) */
+  .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--badges, #f2f4f7);
+    color: var(--button, #e44848);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1;
+    text-transform: uppercase;
+    flex-shrink: 0; /* Щоб аватар не стискався, якщо ім'я довге */
+  }
+
+  .stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+  }
+
+  .stars :global(.star-active) {
+    fill: var(--rating, #ffc107) !important;
+  }
+
+  .stars :global(.star-empty) {
+    fill: var(--badges, #f2f4f7) !important;
+  }
 </style>
 
 <script>
