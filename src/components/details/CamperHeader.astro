@@ -1,0 +1,66 @@
+---
+import Icon from "../Icon.astro";
+import FavoriteButton from "../FavoriteButton.jsx";
+const { camper } = Astro.props;
+---
+
+<section class="header">
+  <h1>{camper.name}</h1>
+  <div class="meta-info">
+    <div class="rating-location">
+      <span class="rating">
+        <Icon name="starfull" size={16} class="star-icon" />
+        {camper.rating} ({camper.reviews.length} Reviews)
+      </span>
+      <span class="location">
+        <Icon name="map" size={16} />
+        {camper.location}
+      </span>
+    </div>
+    <div class="price-wrapper">
+      <p class="price">€{camper.price.toLocaleString("en-IN")}.00</p>
+      <FavoriteButton
+        client:only="preact"
+        camper={camper}
+        className="details-fav-btn"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .header h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .rating-location {
+    display: flex;
+    gap: 16px;
+    font-size: 16px;
+  }
+  .rating {
+    text-decoration: underline;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .star-icon {
+    color: #ffc107;
+  }
+  .price-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .price {
+    font-size: 32px;
+    font-weight: 600;
+  }
+</style>

@@ -5,6 +5,9 @@ import Icon from "../../components/Icon.astro";
 import type { Camper } from "../../types/camper";
 import BookingForm from "../../components/BookingForm.astro";
 import FavoriteButton from "../../components/FavoriteButton.jsx";
+import CamperHeader from "../../components/details/CamperHeader.astro";
+import CamperFeatures from "../../components/details/CamperFeatures.astro";
+import CamperReviews from "../../components/details/CamperReviews.astro";
 
 const { id } = Astro.params;
 const camper: Camper | null = await fetchCamperById(id as string);
@@ -70,126 +73,40 @@ const formatForm = (text: string) =>
 <Layout title={name}>
   <main class="details-page">
     <div class="container">
-      {/* 1. Header Section */}
-      <section class="header">
-        <h1>{name}</h1>
-        <div class="meta-info">
-          <div class="rating-location">
-            <span class="rating">
-              <Icon name="starfull" size={16} class="star-icon" />
-              {rating} ({reviews.length} Reviews)
-            </span>
-            <span class="location">
-              <Icon name="map" size={16} />
-              {location}
-            </span>
-          </div>
-          <div class="price-wrapper">
-            <p class="price">€{price.toLocaleString("en-IN")}.00</p>
-            <FavoriteButton
-              client:only="preact"
-              camper={camper}
-              className="details-fav-btn"
-            >
-              <div slot="fallback"><Icon name="heart" size={24} /></div>
-            </FavoriteButton>
-          </div>
-        </div>
-      </section>
+      <CamperHeader camper={camper} />
 
-      {/* 2. Gallery Section */}
-      <section class="gallery">
-        {
-          gallery.slice(0, 3).map((img) => (
-            <div class="gallery-item">
-              <img src={img.original} alt={name} />
-            </div>
-          ))
-        }
-      </section>
+      <section class="gallery">{/* Можна теж винести */}</section>
 
-      {/* 3. Description Section */}
       <section class="description-section">
         <p>{description}</p>
       </section>
 
-      {/* 4. Tabs Navigation (ЗВЕРХУ СІТКИ, як у React) */}
       <div class="tabs-nav" role="tablist">
-        <button class="tab-link active" data-tab="features" role="tab"
-          >Features</button
-        >
-        <button class="tab-link" data-tab="reviews" role="tab"
+        <button class="tab-link active" data-tab="features">Features</button>
+        <button class="tab-link" data-tab="reviews"
           >Reviews ({reviews.length})</button
         >
       </div>
 
-      {/* 5. Main Layout Grid (Content + Sidebar) */}
       <div class="main-layout">
         <div class="content-left">
           <div id="features-content" class="tab-pane active">
-            <div class="features-inner-card">
-              <div class="badges-grid">
-                {
-                  features.map((f) => (
-                    <div class="badge">
-                      <Icon name={f.icon} size={20} />
-                      <span>{f.label}</span>
-                    </div>
-                  ))
-                }
-              </div>
-
-              <div class="details-block">
-                <h3>Vehicle details</h3>
-                <ul class="details-list">
-                  <li><span>Form</span> <span>{formatForm(form)}</span></li>
-                  <li><span>Length</span> <span>{length}</span></li>
-                  <li><span>Width</span> <span>{width}</span></li>
-                  <li><span>Height</span> <span>{height}</span></li>
-                  <li><span>Tank</span> <span>{tank}</span></li>
-                  <li><span>Consumption</span> <span>{consumption}</span></li>
-                </ul>
-              </div>
-            </div>
+            <CamperFeatures
+              features={features}
+              details={{
+                Form: formatForm(form),
+                Length: length,
+                Width: width,
+                Height: height,
+                Tank: tank,
+                Consumption: consumption,
+              }}
+            />
           </div>
-
           <div id="reviews-content" class="tab-pane">
-            <div class="reviews-list">
-              {
-                reviews.map((review) => (
-                  <div class="review-item">
-                    <div class="review-header">
-                      <div class="avatar">{review.reviewer_name.charAt(0)}</div>
-                      <div class="reviewer-info">
-                        <p class="reviewer-name">{review.reviewer_name}</p>
-                        <div class="stars">
-                          {[...Array(5)].map((_, i) => (
-                            <Icon
-                              name={
-                                i < review.reviewer_rating
-                                  ? "starfull"
-                                  : "starempty"
-                              }
-                              size={16}
-                              class={
-                                i < review.reviewer_rating
-                                  ? "star-active"
-                                  : "star-empty"
-                              }
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <p class="review-comment">{review.comment}</p>
-                  </div>
-                ))
-              }
-            </div>
+            <CamperReviews reviews={reviews} />
           </div>
         </div>
-
-        {/* 6. Sidebar Right */}
         <aside class="booking-sidebar">
           <BookingForm />
         </aside>

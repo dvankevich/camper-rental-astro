@@ -1,0 +1,87 @@
+---
+import Icon from "../Icon.astro";
+const { reviews } = Astro.props;
+---
+
+<div class="reviews-list">
+  {
+    reviews.map((review) => (
+      <div class="review-item">
+        <div class="review-header">
+          <div class="avatar">{review.reviewer_name.charAt(0)}</div>
+          <div class="reviewer-info">
+            <p class="reviewer-name">{review.reviewer_name}</p>
+            <div class="stars">
+              {[...Array(5)].map((_, i) => (
+                <Icon
+                  name={i < review.reviewer_rating ? "starfull" : "starempty"}
+                  size={16}
+                  class={
+                    i < review.reviewer_rating ? "star-active" : "star-empty"
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+        <p class="review-comment">{review.comment}</p>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+  .review-header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--badges, #f2f4f7);
+    color: var(--button, #e44848);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .reviewer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stars {
+    display: flex;
+    gap: 4px;
+  }
+  .stars :global(svg.star-active) {
+    fill: var(--rating, #ffc107) !important;
+    color: var(--rating, #ffc107) !important;
+  }
+
+  .stars :global(svg.star-empty) {
+    fill: var(--badges, #f2f4f7) !important;
+    color: var(--badges, #f2f4f7) !important;
+  }
+  .stars :global(.star-active) {
+    fill: var(--rating, #ffc107) !important;
+  }
+  .stars :global(.star-empty) {
+    fill: var(--badges, #f2f4f7) !important;
+  }
+  .review-comment {
+    color: #475467;
+    line-height: 1.5;
+  }
+</style>
